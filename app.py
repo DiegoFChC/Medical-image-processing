@@ -163,14 +163,92 @@ def change_page():
         lateral_view_umbralizacion.pack(side="left", padx=(0, 20), pady=20)
         lateral_view_regiones.pack_forget()
         lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
     elif segmentacion_actual == "regiones":
         lateral_view_umbralizacion.pack_forget()
         lateral_view_regiones.pack(side="left", padx=(0, 20), pady=20)
         lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
     elif segmentacion_actual == "k-means":
         lateral_view_umbralizacion.pack_forget()
         lateral_view_regiones.pack_forget()
         lateral_view_k_means.pack(side="left", padx=(0, 20), pady=20)
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
+    elif segmentacion_actual == "z-score":
+        lateral_view_umbralizacion.pack_forget()
+        lateral_view_regiones.pack_forget()
+        lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack(side="left", padx=(0, 20), pady=20)
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
+    elif segmentacion_actual == "intensity_rescaling":
+        lateral_view_umbralizacion.pack_forget()
+        lateral_view_regiones.pack_forget()
+        lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack(side="left", padx=(0, 20), pady=20)
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
+    elif segmentacion_actual == "white_stripe":
+        lateral_view_umbralizacion.pack_forget()
+        lateral_view_regiones.pack_forget()
+        lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack(side="left", padx=(0, 20), pady=20)
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
+    elif segmentacion_actual == "histogram_matching":
+        lateral_view_umbralizacion.pack_forget()
+        lateral_view_regiones.pack_forget()
+        lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack(side="left", padx=(0, 20), pady=20)
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack_forget()
+    elif segmentacion_actual == "mean_filter":
+        lateral_view_umbralizacion.pack_forget()
+        lateral_view_regiones.pack_forget()
+        lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack(side="left", padx=(0, 20), pady=20)
+        lateral_view_median_filter.pack_forget()
+    elif segmentacion_actual == "median_filter":
+        lateral_view_umbralizacion.pack_forget()
+        lateral_view_regiones.pack_forget()
+        lateral_view_k_means.pack_forget()
+        lateral_view_z_score.pack_forget()
+        lateral_view_i_rescaling.pack_forget()
+        lateral_view_white_stripe.pack_forget()
+        lateral_view_h_matching.pack_forget()
+        lateral_view_mean_filter.pack_forget()
+        lateral_view_median_filter.pack(side="left", padx=(0, 20), pady=20)
 
 
 def draw_img():
@@ -244,6 +322,9 @@ ctk.CTkButton(master=sidebar, image=seg_img, text="Segmentación", fg_color="#09
     "Arial Bold", 16), anchor="w", corner_radius=10, hover_color="#0C5EF7", command=segmentacion_).pack(fill="x", ipady=5, pady=(20, 0))
 
 # Sub-botones
+sub_buttons = Image.open("arrow.png")
+img_sub_buttons = ctk.CTkImage(
+    dark_image=sub_buttons, light_image=sub_buttons, size=(15, 15))
 
 
 def segmentacion_umbralizacion():
@@ -252,7 +333,7 @@ def segmentacion_umbralizacion():
     change_page()
 
 
-ctk.CTkButton(master=sidebar, text="  Umbralización", fg_color="#090909", font=(
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="Umbralización", fg_color="#090909", font=(
     "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=segmentacion_umbralizacion).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
 
 
@@ -262,7 +343,7 @@ def segmentacion_regiones():
     change_page()
 
 
-ctk.CTkButton(master=sidebar, text="  Crecimiento de regiones", fg_color="#090909", font=(
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="Crecimiento de regiones", fg_color="#090909", font=(
     "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=segmentacion_regiones).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
 
 
@@ -272,8 +353,91 @@ def segmentacion_k_means():
     change_page()
 
 
-ctk.CTkButton(master=sidebar, text="  K-means", fg_color="#090909", font=(
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="K-means", fg_color="#090909", font=(
     "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=segmentacion_k_means).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
+# SECCION 3
+
+
+def estandarizacion_z_score():
+    global segmentacion_actual
+    segmentacion_actual = "z-score"
+    change_page()
+
+
+# Botón de segmentación
+std_z_score_img_data = Image.open("histograma.png")
+z_score_img = ctk.CTkImage(
+    dark_image=std_z_score_img_data, light_image=std_z_score_img_data)
+ctk.CTkButton(master=sidebar, image=z_score_img, text="Estandarización", fg_color="#090909", font=(
+    "Arial Bold", 16), anchor="w", corner_radius=10, hover_color="#0C5EF7", command=estandarizacion_z_score).pack(fill="x", ipady=5, pady=(20, 0))
+
+# Sub-botones
+
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="Z-Score", fg_color="#090909", font=(
+    "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=estandarizacion_z_score).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
+
+def estandarizacion_int_rescaling():
+    global segmentacion_actual
+    segmentacion_actual = "intensity_rescaling"
+    change_page()
+
+
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="Reescalamiento", fg_color="#090909", font=(
+    "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=estandarizacion_int_rescaling).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
+
+def estandarizacion_white_stripe():
+    global segmentacion_actual
+    segmentacion_actual = "white_stripe"
+    change_page()
+
+
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="White stripe", fg_color="#090909", font=(
+    "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=estandarizacion_white_stripe).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
+
+def estandarizacion_h_matching():
+    global segmentacion_actual
+    segmentacion_actual = "histogram_matching"
+    change_page()
+
+
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="H-matching", fg_color="#090909", font=(
+    "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=estandarizacion_h_matching).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
+# SECCION 4
+
+
+def ruido_mean_filter():
+    global segmentacion_actual
+    segmentacion_actual = "mean_filter"
+    change_page()
+
+
+# Botón de segmentación
+std_z_score_img_data = Image.open("ruido.png")
+z_score_img = ctk.CTkImage(
+    dark_image=std_z_score_img_data, light_image=std_z_score_img_data)
+ctk.CTkButton(master=sidebar, image=z_score_img, text="Remoción de ruido", fg_color="#090909", font=(
+    "Arial Bold", 16), anchor="w", corner_radius=10, hover_color="#0C5EF7", command=ruido_mean_filter).pack(fill="x", ipady=5, pady=(20, 0))
+
+# Sub-botones
+
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="Filtro promedio", fg_color="#090909", font=(
+    "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=ruido_mean_filter).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
+
+def ruido_median_filter():
+    global segmentacion_actual
+    segmentacion_actual = "median_filter"
+    change_page()
+
+
+ctk.CTkButton(master=sidebar, image=img_sub_buttons, text="Filtro mediana", fg_color="#090909", font=(
+    "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", command=ruido_median_filter).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+
 
 ##################### VISTA PRINCIPAL #####################
 main_view = ctk.CTkFrame(master=app, width=main_view_width,
@@ -513,7 +677,8 @@ def seg_crecimiento_regiones():
     tolerancia = slider_tolerancia_regiones_var.get()
     punto_inicial = (110, 25, 125)
     iteraciones = slider_iteraciones_regiones_var.get()
-    print("tolerancia:", tolerancia, "Punto inicial:", punto_inicial, "Iteraciones:", iteraciones)
+    print("tolerancia:", tolerancia, "Punto inicial:",
+          punto_inicial, "Iteraciones:", iteraciones)
     temp_img = segmentacion.crecimiento_regiones_3d(
         tolerancia, punto_inicial, iteraciones)
     img_main = temp_img
@@ -593,10 +758,10 @@ label_k_means = ctk.CTkLabel(lateral_view_k_means, text="K-MEANS",
 
 # Label y slider para iteraciones
 label_k_means_iteraciones = ctk.CTkLabel(lateral_view_k_means, text="Iteraciones",
-                                          fg_color="transparent", text_color="#ffffff", justify="left", font=("Arial Bold", 15)).pack(fill="x", pady=20)
+                                         fg_color="transparent", text_color="#ffffff", justify="left", font=("Arial Bold", 15)).pack(fill="x", pady=20)
 
 slider_k_means_iteraciones = ctk.CTkLabel(lateral_view_k_means, text="0", fg_color="#0C5EF7",
-                                           text_color="#ffffff", justify="center", width=40, corner_radius=5)
+                                          text_color="#ffffff", justify="center", width=40, corner_radius=5)
 slider_k_means_iteraciones.pack_propagate(0)
 slider_k_means_iteraciones.pack(pady=(10, 5))
 
@@ -606,7 +771,7 @@ def slider_event_iteraciones_k_means(value):
 
 
 slider_k_menas = ctk.CTkSlider(lateral_view_k_means, from_=0, to=100,
-                                  variable=slider_iteraciones_k_means_var, command=slider_event_iteraciones_k_means)
+                               variable=slider_iteraciones_k_means_var, command=slider_event_iteraciones_k_means)
 slider_k_menas.set(0)
 slider_k_menas.pack_propagate(0)
 slider_k_menas.pack(pady=(10, 30))
@@ -637,6 +802,155 @@ k_means_button = ctk.CTkButton(master=lateral_view_k_means, text="Ejecutar algor
 
 k_means_save = ctk.CTkButton(master=lateral_view_k_means, text="Guardar segmentación", fg_color="#5992FC", font=(
     "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+###############################################################################
+# ESTANDARIZACIÓN
+
+# Z-SCORE
+lateral_view_z_score = ctk.CTkFrame(master=app, width=250,
+                                    height=app_height, fg_color="transparent", corner_radius=20)
+lateral_view_z_score.pack_propagate(0)
+# lateral_view.pack(side="left", padx=(0, 20), pady=20)
+
+
+def stand_z_score():
+    global img_main
+    temp_img = segmentacion.z_score(10)
+    img_main = temp_img
+    updateImageView()
+    
+label_z_score = ctk.CTkLabel(lateral_view_z_score, text="Z-SCORE",
+                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+
+std_z_score_button = ctk.CTkButton(master=lateral_view_z_score, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=stand_z_score).pack(fill="x", pady=20)
+
+std_z_score_save = ctk.CTkButton(master=lateral_view_z_score, text="Guardar segmentación", fg_color="#5992FC", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+# Reescalamiento
+lateral_view_i_rescaling = ctk.CTkFrame(master=app, width=250,
+                                    height=app_height, fg_color="transparent", corner_radius=20)
+lateral_view_i_rescaling.pack_propagate(0)
+# lateral_view.pack(side="left", padx=(0, 20), pady=20)
+
+
+def stand_i_rescaling():
+    global img_main
+    temp_img = segmentacion.intensity_rescaling()
+    img_main = temp_img
+    updateImageView()
+    
+label_i_rescaling = ctk.CTkLabel(lateral_view_i_rescaling, text="INTENSITY RESCALING",
+                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+
+std_i_rescaling_button = ctk.CTkButton(master=lateral_view_i_rescaling, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=stand_i_rescaling).pack(fill="x", pady=20)
+
+std_i_rescaling_save = ctk.CTkButton(master=lateral_view_i_rescaling, text="Guardar segmentación", fg_color="#5992FC", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+# White stripe
+lateral_view_white_stripe = ctk.CTkFrame(master=app, width=250,
+                                    height=app_height, fg_color="transparent", corner_radius=20)
+lateral_view_white_stripe.pack_propagate(0)
+# lateral_view.pack(side="left", padx=(0, 20), pady=20)
+
+
+def stand_white_stripe():
+    global img_main
+    temp_img = segmentacion.white_stripe(20000)
+    img_main = temp_img
+    updateImageView()
+    
+label_white_stripe = ctk.CTkLabel(lateral_view_white_stripe, text="WHITE STRIPE",
+                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+
+std_white_stripe_button = ctk.CTkButton(master=lateral_view_white_stripe, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=stand_white_stripe).pack(fill="x", pady=20)
+
+std_white_stripe_save = ctk.CTkButton(master=lateral_view_white_stripe, text="Guardar segmentación", fg_color="#5992FC", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+# Histogram matching
+lateral_view_h_matching = ctk.CTkFrame(master=app, width=250,
+                                    height=app_height, fg_color="transparent", corner_radius=20)
+lateral_view_h_matching.pack_propagate(0)
+# lateral_view.pack(side="left", padx=(0, 20), pady=20)
+
+
+def stand_h_matching():
+    global img_main
+    temp_img = segmentacion.histogram_matching()
+    img_main = temp_img
+    updateImageView()
+    
+label_h_matching = ctk.CTkLabel(lateral_view_h_matching, text="HISTOGRAM MATCHING",
+                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+
+std_h_matching_button = ctk.CTkButton(master=lateral_view_h_matching, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=stand_h_matching).pack(fill="x", pady=20)
+
+std_h_matching_save = ctk.CTkButton(master=lateral_view_h_matching, text="Guardar segmentación", fg_color="#5992FC", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+############################################
+# REMOCION DE RUIDO
+# Filtro promedio
+lateral_view_mean_filter = ctk.CTkFrame(master=app, width=250,
+                                    height=app_height, fg_color="transparent", corner_radius=20)
+lateral_view_mean_filter.pack_propagate(0)
+# lateral_view.pack(side="left", padx=(0, 20), pady=20)
+
+
+def stand_mean_filter():
+    global img_main
+    temp_img = segmentacion.mean_filter(3)
+    img_main = temp_img
+    updateImageView()
+    
+label_mean_filter = ctk.CTkLabel(lateral_view_mean_filter, text="MEAN FILTER",
+                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+
+std_mean_filter_button = ctk.CTkButton(master=lateral_view_mean_filter, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=stand_mean_filter).pack(fill="x", pady=20)
+
+std_mean_filter_save = ctk.CTkButton(master=lateral_view_mean_filter, text="Guardar segmentación", fg_color="#5992FC", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+# Filtro mediana
+lateral_view_median_filter = ctk.CTkFrame(master=app, width=250,
+                                    height=app_height, fg_color="transparent", corner_radius=20)
+lateral_view_median_filter.pack_propagate(0)
+# lateral_view.pack(side="left", padx=(0, 20), pady=20)
+
+
+def stand_median_filter():
+    global img_main
+    temp_img = segmentacion.median_filter(3)
+    img_main = temp_img
+    updateImageView()
+    
+label_median_filter = ctk.CTkLabel(lateral_view_median_filter, text="MEDIAN FILTER",
+                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+
+std_median_filter_button = ctk.CTkButton(master=lateral_view_median_filter, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=stand_median_filter).pack(fill="x", pady=20)
+
+std_median_filter_save = ctk.CTkButton(master=lateral_view_median_filter, text="Guardar segmentación", fg_color="#5992FC", font=(
+    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Loop que mantiene via la app
 app.mainloop()

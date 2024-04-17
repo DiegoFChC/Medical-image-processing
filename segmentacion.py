@@ -11,6 +11,7 @@ max_value = 1
 min_value = 1
 array_anotado = []
 
+
 def normalizar_rango(matriz):
     """Normaliza una matriz 3D por rango."""
     minimo = np.min(matriz)
@@ -126,23 +127,160 @@ def k_means(it, puntos):
             for j in range(img.shape[1]):
                 for k in range(img.shape[2]):
                     if img[i, j, k] != 0:
-                        diff = [abs(centroide - img[i, j, k]) for centroide in centroides]
+                        diff = [abs(centroide - img[i, j, k])
+                                for centroide in centroides]
                         new_img_k[i, j, k] = np.argmin(diff) + 1
 
         for i in range(len(centroides)):
             centroides[i] = np.mean(img[new_img_k == i+1])
         iteracion += 1
-    
+
     # if k > 1:
     #     img_norm = normalizar_rango(new_img_k)
-    
+
     print("Fin de k-means!!!")
     return new_img_k
+
 
 def anotar_imagen(x, y, z, array):
     global array_anotado
     array_anotado[x, y, z] = array[x, y, z]
 
+
 def reiniciar_anotacion():
     global img_main, array_anotado
     array_anotado = np.zeros_like(img_main, dtype=np.int8)
+
+
+def z_score(background_intensity):
+    # mean_value = image.mean()
+    # std_value = image.std()
+    global img_main
+    image = copy.deepcopy(img_main)
+    mean_value = image[image > background_intensity].mean()
+    std_value = image[image > background_intensity].std()
+    img_zscore = (image - mean_value) / std_value
+    print("Fin de z-score!!!")
+    return img_zscore
+
+
+def intensity_rescaling():
+    global img_main
+    image = copy.deepcopy(img_main)
+    min = np.min(image)
+    max = np.max(image)
+    new_image = (image - min)/(max - min)
+    print("Fin de rescaling!!!")
+    return new_image
+
+
+def white_stripe(umbral):
+    global img_main
+    image = copy.deepcopy(img_main)
+    # Calculamos el histograma de intensidades
+    hist, bins = np.histogram(
+        image.flatten(), bins=256, range=[0, np.max(image)])
+
+    # Calculamos la derivada del histograma
+    deriv = np.diff(hist)
+
+    # Buscamos los máximos locales en el histograma. Estos corresponden a los picos.
+    maximos = []
+    for i in range(1, len(hist)-1):
+        if hist[i-1] < hist[i] > hist[i+1] and hist[i] > umbral:
+            maximos.append(i)
+
+    ultimo_pico = maximos[-1]
+
+    # Estandarizacion
+    ws = bins[ultimo_pico]
+    print('Ultimo pico:', ws)
+    new_image = image/ws
+    print("Fin de white_space!!!")
+    return new_image
+
+
+def histogram_matching():
+    print("Fin de h-matching!!!")
+    pass
+
+
+def mean_filter(tamano_filtro):
+    """
+    Función que aplica un filtro de media a una imagen 3D (.nii).
+
+    Argumentos:
+      imagen_3d: La imagen 3D como un array de NumPy.
+      tamano_filtro: El tamaño del filtro (un número impar positivo).
+
+    Retorna:
+      La imagen filtrada como un array de NumPy.
+    """
+    global img_main
+    imagen_3d = copy.deepcopy(img_main)
+    # Calcular el radio del filtro
+    radio = (tamano_filtro - 1) // 2
+
+    # Añadir bordes a la imagen para evitar errores de límites
+    imagen_3d_pad = np.pad(
+        imagen_3d, ((radio, radio), (radio, radio), (radio, radio)), mode='constant')
+
+    # Inicializar la imagen filtrada
+    imagen_filtrada = np.zeros_like(imagen_3d)
+
+    # Recorrer cada voxel de la imagen original
+    for i in range(imagen_3d.shape[0]):
+        for j in range(imagen_3d.shape[1]):
+            for k in range(imagen_3d.shape[2]):
+                # Obtener los vecinos del voxel actual
+                vecinos = imagen_3d_pad[i:i+tamano_filtro,
+                                        j:j+tamano_filtro, k:k+tamano_filtro]
+
+                # Calcular el valor promedio de los vecinos
+                valor_promedio = np.mean(vecinos)
+
+                # Asignar el valor promedio al voxel filtrado correspondiente
+                imagen_filtrada[i, j, k] = valor_promedio
+    print("Fin de mean-filter!!!")
+    return imagen_filtrada
+
+
+def median_filter(tamano_filtro):
+    """
+    Función que aplica un filtro de mediana a una imagen 3D (.nii).
+
+    Argumentos:
+      imagen_3d: La imagen 3D como un array de NumPy.
+      tamano_filtro: El tamaño del filtro (un número impar positivo).
+
+    Retorna:
+      La imagen filtrada como un array de NumPy.
+    """
+    global img_main
+    imagen_3d = copy.deepcopy(img_main)
+
+    # Calcular el radio del filtro
+    radio = (tamano_filtro - 1) // 2
+
+    # Añadir bordes a la imagen para evitar errores de límites
+    imagen_3d_pad = np.pad(
+        imagen_3d, ((radio, radio), (radio, radio), (radio, radio)), mode='constant')
+
+    # Inicializar la imagen filtrada
+    imagen_filtrada = np.zeros_like(imagen_3d)
+
+    # Recorrer cada voxel de la imagen original
+    for i in range(imagen_3d.shape[0]):
+        for j in range(imagen_3d.shape[1]):
+            for k in range(imagen_3d.shape[2]):
+                # Obtener los vecinos del voxel actual
+                vecinos = imagen_3d_pad[i:i+tamano_filtro,
+                                        j:j+tamano_filtro, k:k+tamano_filtro].flatten()
+
+                # Calcular la mediana de los vecinos
+                valor_mediana = np.median(vecinos)
+
+                # Asignar la mediana al voxel filtrado correspondiente
+                imagen_filtrada[i, j, k] = valor_mediana
+    print("Fin de median-filter!!!")
+    return imagen_filtrada
