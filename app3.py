@@ -441,7 +441,7 @@ def seg_thresholding():
     app_Status.set_app_img_main(temp_img)
     updateImageView()
 
-
+pack
 label_umbralización = ctk.CTkLabel(lateral_view_umbralizacion, text="UMBRALIZACIÓN",
                                    fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
 

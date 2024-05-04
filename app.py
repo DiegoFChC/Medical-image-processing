@@ -4,10 +4,13 @@ from PIL import Image, ImageTk
 import matplotlib.pyplot as plt
 import numpy as np
 import nibabel as nib
+import math
 from src.components.configuration_app import Configuration_App
 from src.components.app_status import App_Status
 from src.components.algorithm_status import Algorithm_Status
 import src.components.components as comp
+# Algorithms
+from src.algorithms.segmentation.thresholding import thresholding
 
 # APP STATE
 configuration_App = Configuration_App()
@@ -32,19 +35,23 @@ app.configure(fg_color=configuration_App.BACKGROUND_COLOR)
 app.iconbitmap("src/icons/icon.ico")
 
 ###########################################################################
-#                           VARIABLES DE CONTROL                          #
+#                             CONTROL VARIABLES                           #
 ###########################################################################
+# Canvas
 canvas_slider_variable = tk.IntVar(value=0)
 option_menu_view_type_variable = tk.StringVar(value="coronal")
-slider_umbralizacion_tau = tk.IntVar(value=0)
-slider_tolerancia_regiones_var = tk.IntVar(value=0)
-slider_iteraciones_regiones_var = tk.IntVar(value=0)
-slider_iteraciones_k_means_var = tk.IntVar(value=0)
-slider_umbralizacion_delta_tau = tk.DoubleVar(value=0)
+# Thresholding
+var_thresholding_slider_tau = tk.IntVar(value=0)
+var_thresholding_slider_delta_tau = tk.DoubleVar(value=0)
+# Region Growing
+var_region_growing_slider_tolerance = tk.IntVar(value=0)
+var_region_growing_slider_iterations = tk.IntVar(value=0)
+# K-means
+var_k_means_slider_iterations = tk.IntVar(value=0)
 
 
 ###########################################################################
-#                     FUNCIONES PARA CONTROL DE FLUJO                     #
+#                          FLOW CONTROL FUNCTIONS                         #
 ###########################################################################
 
 
@@ -98,6 +105,9 @@ def draw_on_img():
         canvas_label_slider.show_label()
         canvas_slider.show_slider()
         button_select_edition_mode.show_button()
+
+def save_new_img_nii(name):
+    app_Status.save_image_nii(name)
 
 # APP VIEW
 
@@ -185,13 +195,8 @@ btn_upload_nii.show_button()
 
 # Options menu for view type
 
-
-def select_view_type():
-    updateImageView()
-
-
 option_menu_view_type = comp.Option_Menu(ctk, main_view_edition_nii.get_frame(), [
-                                         "coronal", "sagital", "axial"], option_menu_view_type_variable, select_view_type)
+                                         "coronal", "sagital", "axial"], option_menu_view_type_variable, lambda x: updateImageView())
 option_menu_view_type.show_option_menu()
 
 # Canvas like a label
@@ -237,8 +242,69 @@ button_select_edition_mode.show_button()
 
 button_save_annotations = comp.Button(ctk, main_view_edition_nii.get_frame(
 ), 'Save annotations to new .nii file', 300, algorithm_Status.export_annotations)
-button_save_annotations.show_button()
+# button_save_annotations.show_button()
 
+
+###########################################################################
+#                               SIDES VIEWS                               #
+###########################################################################
+
+# ------------------------------ Thresholding ------------------------------
+side_view_thresholding = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent')
+
+
+def segmentation_thresholding():
+    tau = int(var_thresholding_slider_tau.get())
+    delta_tau = math.floor(var_thresholding_slider_delta_tau.get())
+    new_img = thresholding(tau, delta_tau, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+
+thresholding_label_title = comp.Label_Simple(
+    ctk, side_view_thresholding.get_frame(), 'THRESHOLDING', 20)
+thresholding_label_title.show_label()
+
+thresholding_label_tau = comp.Label_Simple(
+    ctk, side_view_thresholding.get_frame(), 'Initial Tau', 15)
+thresholding_label_tau.show_label()
+
+thresholding_label_slider_tau = comp.Label_Text_Slider(
+    ctk, side_view_thresholding.get_frame(), '0', 40, 5)
+thresholding_label_slider_tau.show_label()
+
+
+def thresholding_slider_tau_event(value):
+    thresholding_label_slider_tau.set_value_label(int(value))
+
+
+thresholding_slider_tau = comp.Slider(ctk, side_view_thresholding.get_frame(
+), 0, 100, thresholding_slider_tau_event, var_thresholding_slider_tau)
+thresholding_slider_tau.show_slider()
+
+thresholding_label_tau_delta = comp.Label_Simple(
+    ctk, side_view_thresholding.get_frame(), 'Tau Delta', 15)
+thresholding_label_tau_delta.show_label()
+
+thresholding_label_slider_tau_delta = comp.Label_Text_Slider(
+    ctk, side_view_thresholding.get_frame(), '0', 40, 5)
+thresholding_label_slider_tau_delta.show_label()
+
+
+def thresholding_slider_tau_delta_event(value):
+    thresholding_label_slider_tau_delta.set_value_label(int(value))
+
+
+thresholding_slider_tau_delta = comp.Slider(ctk, side_view_thresholding.get_frame(
+), 0, 100, thresholding_slider_tau_delta_event, var_thresholding_slider_delta_tau)
+thresholding_slider_tau_delta.show_slider()
+
+thresholding_button_run = comp.Button(ctk, side_view_thresholding.get_frame(), 'Run algorithm', 100, segmentation_thresholding)
+thresholding_button_run.show_button_custom()
+
+thresholding_button_save = comp.Button(ctk, side_view_thresholding.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('thresholding'))
+thresholding_button_save.show_button_custom()
 
 ###########################################################################
 #                                MAIN LOOP                                #

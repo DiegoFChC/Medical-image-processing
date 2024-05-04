@@ -7,7 +7,7 @@ class Configuration_App:
 
     def __init__(self):
         self.main_view_width = 1350
-        self.help_view_width = 0
+        self.help_view_width = 250
 
     # Getters (accessor methods)
     def get_main_view_width(self):

@@ -63,11 +63,12 @@ class Label_Image:
 
 
 class Label_Text_Slider:
-    def __init__(self, ctk, master, text, width):
+    def __init__(self, ctk, master, text, width, pady=10):
         self.ctk = ctk
         self.master = master
         self.text = text
         self.width = width
+        self.pady = pady
         self.create_label()
 
     def create_label(self):
@@ -82,10 +83,20 @@ class Label_Text_Slider:
 
     def show_label(self):
         self.label.pack_propagate(0)
-        self.label.pack(pady=10)
+        self.label.pack(pady=(10, self.pady))
 
     def hide_label(self):
         self.label.pack_forget()
+
+class Label_Simple:
+    def __init__(self, ctk, master, text, font_size):
+        self.label = ctk.CTkLabel(master, text=text, fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", font_size))
+    
+    def get_label(self):
+        return self.label
+    
+    def show_label(self):
+        self.label.pack(fill='x', pady=20)
 
 
 class Label_Canvas:
@@ -161,7 +172,10 @@ class Button:
 
     def show_button(self):
         self.button.pack(pady=10)
-
+        
+    def show_button_custom(self):
+        self.button.pack(fill='x', pady=20)
+        
     def hide_button(self):
         self.button.pack_forget()
 

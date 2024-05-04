@@ -1,6 +1,9 @@
+import nibabel as nib
+import numpy as np
+
 class App_Status:
     def __init__(self):
-        self.current_segmentation = "umbralización"
+        self.current_process = "umbralización"
         self.draw = False
         self.current_depth = 0
         self.draw_x_prev = None
@@ -11,8 +14,8 @@ class App_Status:
         self.app_img_main = []
 
     # Getters (accessor methods)
-    def get_current_segmentation(self):
-        return self.current_segmentation
+    def get_current_process(self):
+        return self.current_process
 
     def get_draw(self):
         return self.draw
@@ -39,8 +42,8 @@ class App_Status:
         return self.app_img_main
 
     # Setters (mutator methods)
-    def set_current_segmentation(self, new_segmentation):
-        self.current_segmentation = new_segmentation
+    def set_current_process(self, new_segmentation):
+        self.current_process = new_segmentation
 
     def set_draw(self, new_draw_state):
         self.draw = new_draw_state
@@ -74,3 +77,8 @@ class App_Status:
     def reset_coordinates_draw(self, event):
         self.set_draw_x_prev(None)
         self.set_draw_y_prev(None)
+    
+    def save_image_nii(self, name):
+        img_uint8 = self.get_app_img_main().astype(np.uint8)
+        nii_img = nib.Nifti1Image(img_uint8, affine=np.eye(4))
+        nib.save(nii_img, f"src/saved_processes/{name}.nii")
