@@ -24,15 +24,16 @@ app = ctk.CTk()
 # To position the window in the center
 wtotal = app.winfo_screenwidth()
 htotal = app.winfo_screenheight()
-pwidth = round(((wtotal-configuration_App.APP_WIDTH)/2) - 90)
-pheight = round(((htotal-configuration_App.APP_HEIGHT)/2) - 65)
+# pwidth = round(((wtotal-configuration_App.APP_WIDTH)/2) - 90)
+pwidth = round(((wtotal-configuration_App.APP_WIDTH)/2))
+# pheight = round(((htotal-configuration_App.APP_HEIGHT)/2) - 65)
+pheight = round(((htotal-configuration_App.APP_HEIGHT)/2))
 
-app.geometry(f"{configuration_App.APP_WIDTH}x{
-             configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
+app.geometry(f"{configuration_App.APP_WIDTH}x{configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
 app.resizable(0, 0)
 app.title("PROCESAMIENTO DE IMÁGENES MÉDICAS")
 app.configure(fg_color=configuration_App.BACKGROUND_COLOR)
-app.iconbitmap("src/icons/icon.ico")
+# app.iconbitmap("src/icons/icon.ico")
 
 ###########################################################################
 #                             CONTROL VARIABLES                           #
@@ -109,8 +110,31 @@ def draw_on_img():
 def save_new_img_nii(name):
     app_Status.save_image_nii(name)
 
-# APP VIEW
+def activate_upload():
 
+    for process in app_Status.get_process_views():
+        process.hide_frame()
+
+    configuration_App.set_main_view_width(1350)
+    main_view.set_width_frame(configuration_App.get_main_view_width())
+    container_img_upload_nii.set_width_frame(configuration_App.get_main_view_width())
+    container_img_upload_nii.show_frame_custom()
+    main_view_edition_nii.hide_frame()
+
+def change_page(process_name):
+    configuration_App.set_main_view_width(1000)
+    main_view.set_width_frame(configuration_App.get_main_view_width())
+    container_img_upload_nii.hide_frame()
+    main_view.show_frame_custom()
+
+    for process in app_Status.get_process_views():
+        if process.get_process_name() == process_name:
+            process.show_frame_custom()
+        else:
+            process.hide_frame()
+
+
+# APP VIEW
 
 ###########################################################################
 #                                SIDEBAR                                  #
@@ -136,7 +160,7 @@ label_img_logo.show_label()
 img_btn_start = Image.open("src/icons/home.png")
 img_btn_start_upload = comp.Image_Upload(ctk, img_btn_start, 20, 20)
 btn_start = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Start", img_btn_start_upload.get_image(
-), '#090909', '#0C5EF7', None, 0, 5, [0, 0], [60, 0])
+), '#090909', '#0C5EF7', activate_upload, 0, 5, [0, 0], [60, 0])
 btn_start.show_button()
 
 # SECTION 2: SEGMENTATION
@@ -145,7 +169,7 @@ img_btn_segmentation = Image.open('src/icons/seg.png')
 img_btn_segmentation_upload = comp.Image_Upload(
     ctk, img_btn_segmentation, 20, 20)
 btn_segmentation = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Segmentation", img_btn_segmentation_upload.get_image(
-), '#090909', '#0C5EF7', None, 0, 5, [0, 0], [20, 0])
+), '#090909', '#0C5EF7', lambda: change_page('thresholding'), 0, 5, [0, 0], [20, 0])
 btn_segmentation.show_button()
 
 # SUB-SECTION
@@ -155,17 +179,17 @@ img_btn_sub_section_upload = comp.Image_Upload(
 
 # Thresholding button
 btn_segmentation_thresholding = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Thresholding", img_btn_sub_section_upload.get_image(
-), '#090909', '#5992FC', None, 0, 5, [20, 0], [10, 0])
+), '#090909', '#5992FC', lambda: change_page('thresholding'), 0, 5, [20, 0], [10, 0])
 btn_segmentation_thresholding.show_button()
 
 # Region growing button
 btn_segmentation_region_growing = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Region growing", img_btn_sub_section_upload.get_image(
-), '#090909', '#5992FC', None, 0, 5, [20, 0], [10, 0])
+), '#090909', '#5992FC', lambda: change_page('region_growing'), 0, 5, [20, 0], [10, 0])
 btn_segmentation_region_growing.show_button()
 
 # Region k means
 btn_segmentation_k_means = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Region growing", img_btn_sub_section_upload.get_image(
-), '#090909', '#5992FC', None, 0, 5, [20, 0], [10, 0])
+), '#090909', '#5992FC', lambda: change_page('k_means'), 0, 5, [20, 0], [10, 0])
 btn_segmentation_k_means.show_button()
 
 
@@ -180,6 +204,7 @@ main_view.show_frame_custom()
 # Upload .nii image
 img_upload_nii = Image.open('src/icons/upload.png')
 img_upload_nii_upload = comp.Image_Upload(ctk, img_upload_nii, 50, 50)
+
 container_img_upload_nii = comp.Frame(ctk, main_view.get_frame(
 ), configuration_App.get_main_view_width(), configuration_App.APP_HEIGHT, 'transparent')
 container_img_upload_nii.show_frame_custom()
@@ -251,55 +276,52 @@ button_save_annotations = comp.Button(ctk, main_view_edition_nii.get_frame(
 
 # ------------------------------ Thresholding ------------------------------
 side_view_thresholding = comp.Frame(ctk, app, configuration_App.get_help_view_width(
-), configuration_App.APP_HEIGHT, 'transparent')
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'thresholding')
+side_view_thresholding.show_frame_custom()
+app_Status.add_process_view(side_view_thresholding)
 
 
 def segmentation_thresholding():
     tau = int(var_thresholding_slider_tau.get())
-    delta_tau = math.floor(var_thresholding_slider_delta_tau.get())
+    delta_tau = round(var_thresholding_slider_delta_tau.get(), 1)
     new_img = thresholding(tau, delta_tau, algorithm_Status.get_img_main())
     app_Status.set_app_img_main(new_img)
     updateImageView()
 
-
+# Title
 thresholding_label_title = comp.Label_Simple(
     ctk, side_view_thresholding.get_frame(), 'THRESHOLDING', 20)
 thresholding_label_title.show_label()
 
+# Label initial tau
 thresholding_label_tau = comp.Label_Simple(
     ctk, side_view_thresholding.get_frame(), 'Initial Tau', 15)
 thresholding_label_tau.show_label()
 
+# Label and slider initial tau
 thresholding_label_slider_tau = comp.Label_Text_Slider(
     ctk, side_view_thresholding.get_frame(), '0', 40, 5)
 thresholding_label_slider_tau.show_label()
 
-
-def thresholding_slider_tau_event(value):
-    thresholding_label_slider_tau.set_value_label(int(value))
-
-
 thresholding_slider_tau = comp.Slider(ctk, side_view_thresholding.get_frame(
-), 0, 100, thresholding_slider_tau_event, var_thresholding_slider_tau)
+), 0, 100, lambda value: thresholding_label_slider_tau.set_value_label(int(value)), var_thresholding_slider_tau)
 thresholding_slider_tau.show_slider()
 
+# Label tau delta
 thresholding_label_tau_delta = comp.Label_Simple(
     ctk, side_view_thresholding.get_frame(), 'Tau Delta', 15)
 thresholding_label_tau_delta.show_label()
 
+# Label and slider tau delta
 thresholding_label_slider_tau_delta = comp.Label_Text_Slider(
     ctk, side_view_thresholding.get_frame(), '0', 40, 5)
 thresholding_label_slider_tau_delta.show_label()
 
-
-def thresholding_slider_tau_delta_event(value):
-    thresholding_label_slider_tau_delta.set_value_label(int(value))
-
-
 thresholding_slider_tau_delta = comp.Slider(ctk, side_view_thresholding.get_frame(
-), 0, 100, thresholding_slider_tau_delta_event, var_thresholding_slider_delta_tau)
+), 0, 10, lambda value: thresholding_label_slider_tau_delta.set_value_label(round(value, 1)), var_thresholding_slider_delta_tau)
 thresholding_slider_tau_delta.show_slider()
 
+# Buttons
 thresholding_button_run = comp.Button(ctk, side_view_thresholding.get_frame(), 'Run algorithm', 100, segmentation_thresholding)
 thresholding_button_run.show_button_custom()
 

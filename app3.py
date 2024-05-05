@@ -9,34 +9,34 @@ from auxFuntions.configuration_app import Configuration_App
 from auxFuntions.app_status import App_Status
 from auxFuntions.algorithm_status import Algorithm_Status
 
-# App State
-configuration_App = Configuration_App()
-app_Status = App_Status()
-algorithm_Status = Algorithm_Status()
+# # App State
+# configuration_App = Configuration_App()
+# app_Status = App_Status()
+# algorithm_Status = Algorithm_Status()
 
-# App principal
-app = ctk.CTk()
+# # App principal
+# app = ctk.CTk()
 
-option_menu_view_var = tk.StringVar(value="coronal")
-slider_value_var = tk.IntVar(value=0)
-slider_umbralizacion_tau = tk.IntVar(value=0)
-slider_tolerancia_regiones_var = tk.IntVar(value=0)
-slider_iteraciones_regiones_var = tk.IntVar(value=0)
-slider_iteraciones_k_means_var = tk.IntVar(value=0)
-slider_umbralizacion_delta_tau = tk.DoubleVar(value=0)
+# option_menu_view_var = tk.StringVar(value="coronal")
+# slider_value_var = tk.IntVar(value=0)
+# slider_umbralizacion_tau = tk.IntVar(value=0)
+# slider_tolerancia_regiones_var = tk.IntVar(value=0)
+# slider_iteraciones_regiones_var = tk.IntVar(value=0)
+# slider_iteraciones_k_means_var = tk.IntVar(value=0)
+# slider_umbralizacion_delta_tau = tk.DoubleVar(value=0)
 
-# Para posicionar la ventana en el centro
-wtotal = app.winfo_screenwidth()
-htotal = app.winfo_screenheight()
-pwidth = round((wtotal-configuration_App.APP_WIDTH)/2)
-pheight = round((htotal-configuration_App.APP_HEIGHT)/2)
+# # Para posicionar la ventana en el centro
+# wtotal = app.winfo_screenwidth()
+# htotal = app.winfo_screenheight()
+# pwidth = round((wtotal-configuration_App.APP_WIDTH)/2)
+# pheight = round((htotal-configuration_App.APP_HEIGHT)/2)
 
-app.geometry(f"{configuration_App.APP_WIDTH}x{
-             configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
-app.resizable(0, 0)
-app.title("PROCESAMIENTO DE IMÁGENES MÉDICAS")
-app.configure(fg_color=configuration_App.BACKGROUND_COLOR)
-app.iconbitmap("images/icon.ico")
+# app.geometry(f"{configuration_App.APP_WIDTH}x{
+#              configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
+# app.resizable(0, 0)
+# app.title("PROCESAMIENTO DE IMÁGENES MÉDICAS")
+# app.configure(fg_color=configuration_App.BACKGROUND_COLOR)
+# app.iconbitmap("images/icon.ico")
 
 #################### FUNCTIONS #####################
 
@@ -131,34 +131,34 @@ app.iconbitmap("images/icon.ico")
 #         print("No se seleccionó ningún archivo")
 
 
-def activate_upload():
-    configuration_App.set_main_view_width(1150)
-    main_view.configure(width=configuration_App.get_main_view_width())
-    temporal_upload_img.configure(
-        width=configuration_App.get_main_view_width())
-    temporal_upload_img.pack(side="left", padx=20, pady=20)
-    img_view.pack_forget()
+# def activate_upload():
+#     configuration_App.set_main_view_width(1150)
+#     main_view.configure(width=configuration_App.get_main_view_width())
+#     temporal_upload_img.configure(
+#         width=configuration_App.get_main_view_width())
+#     temporal_upload_img.pack(side="left", padx=20, pady=20)
+#     img_view.pack_forget()
 
 
-def change_page():
-    configuration_App.set_main_view_width(825)
-    main_view.configure(width=configuration_App.get_main_view_width())
-    temporal_upload_img.configure(
-        width=configuration_App.get_main_view_width())
-    temporal_upload_img.pack_forget()
-    img_view.pack(side="left", padx=20, pady=20)
-    if app_Status.get_current_segmentation() == "umbralizacion":
-        lateral_view_umbralizacion.pack(side="left", padx=(0, 20), pady=20)
-        lateral_view_regiones.pack_forget()
-        lateral_view_k_means.pack_forget()
-    elif app_Status.get_current_segmentation() == "regiones":
-        lateral_view_umbralizacion.pack_forget()
-        lateral_view_regiones.pack(side="left", padx=(0, 20), pady=20)
-        lateral_view_k_means.pack_forget()
-    elif app_Status.get_current_segmentation() == "k-means":
-        lateral_view_umbralizacion.pack_forget()
-        lateral_view_regiones.pack_forget()
-        lateral_view_k_means.pack(side="left", padx=(0, 20), pady=20)
+# def change_page():
+#     configuration_App.set_main_view_width(825)
+#     main_view.configure(width=configuration_App.get_main_view_width())
+#     temporal_upload_img.configure(
+#         width=configuration_App.get_main_view_width())
+#     temporal_upload_img.pack_forget()
+#     img_view.pack(side="left", padx=20, pady=20)
+#     if app_Status.get_current_segmentation() == "umbralizacion":
+#         lateral_view_umbralizacion.pack(side="left", padx=(0, 20), pady=20)
+#         lateral_view_regiones.pack_forget()
+#         lateral_view_k_means.pack_forget()
+#     elif app_Status.get_current_segmentation() == "regiones":
+#         lateral_view_umbralizacion.pack_forget()
+#         lateral_view_regiones.pack(side="left", padx=(0, 20), pady=20)
+#         lateral_view_k_means.pack_forget()
+#     elif app_Status.get_current_segmentation() == "k-means":
+#         lateral_view_umbralizacion.pack_forget()
+#         lateral_view_regiones.pack_forget()
+#         lateral_view_k_means.pack(side="left", padx=(0, 20), pady=20)
 
 
 # def draw_img():
@@ -187,10 +187,10 @@ def change_page():
 #         draw_button.pack(pady=20)
 
 
-def save_image_nii():
-    img_uint8 = app_Status.get_app_img_main().astype(np.uint8)
-    nii_img = nib.Nifti1Image(img_uint8, affine=np.eye(4))
-    nib.save(nii_img, "segmentaión.nii")
+# def save_image_nii():
+#     img_uint8 = app_Status.get_app_img_main().astype(np.uint8)
+#     nii_img = nib.Nifti1Image(img_uint8, affine=np.eye(4))
+#     nib.save(nii_img, "segmentaión.nii")
 
 
 #################### SIDEBAR #######################
@@ -217,12 +217,12 @@ def save_image_nii():
 # home_img = ctk.CTkImage(dark_image=home_img_data, light_image=home_img_data)
 # ctk.CTkButton(master=sidebar, image=home_img, text="Inicio", fg_color="#090909", font=(
 #     "Arial Bold", 16), anchor="w", corner_radius=10, hover_color="#0C5EF7", 
-              command=activate_upload).pack(fill="x", ipady=5, pady=(60, 0))
+            #   command=activate_upload).pack(fill="x", ipady=5, pady=(60, 0))
 
 
-def segmentacion_():
-    app_Status.set_current_segmentation("umbralizacion")
-    change_page()
+# def segmentacion_():
+#     app_Status.set_current_segmentation("umbralizacion")
+#     change_page()
 
 
 # Botón de segmentación
@@ -230,39 +230,39 @@ def segmentacion_():
 # seg_img = ctk.CTkImage(dark_image=seg_img_data, light_image=seg_img_data)
 # ctk.CTkButton(master=sidebar, image=seg_img, text="Segmentación", fg_color="#090909", font=(
 #     "Arial Bold", 16), anchor="w", corner_radius=10, hover_color="#0C5EF7", 
-              command=segmentacion_).pack(fill="x", ipady=5, pady=(20, 0))
+            #   command=segmentacion_).pack(fill="x", ipady=5, pady=(20, 0))
 
 # Sub-botones
 
 
-def segmentacion_umbralizacion():
-    app_Status.set_current_segmentation("umbralizacion")
-    change_page()
+# def segmentacion_umbralizacion():
+#     app_Status.set_current_segmentation("umbralizacion")
+#     change_page()
 
 
 # ctk.CTkButton(master=sidebar, text="  Umbralización", fg_color="#090909", font=(
 #     "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", 
-              command=segmentacion_umbralizacion).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+            #   command=segmentacion_umbralizacion).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
 
 
-def segmentacion_regiones():
-    app_Status.set_current_segmentation("regiones")
-    change_page()
+# def segmentacion_regiones():
+#     app_Status.set_current_segmentation("regiones")
+#     change_page()
 
 
 # ctk.CTkButton(master=sidebar, text="  Crecimiento de regiones", fg_color="#090909", font=(
 #     "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", 
-              command=segmentacion_regiones).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+            #   command=segmentacion_regiones).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
 
 
-def segmentacion_k_means():
-    app_Status.set_current_segmentation("k-means")
-    change_page()
+# def segmentacion_k_means():
+#     app_Status.set_current_segmentation("k-means")
+#     change_page()
 
 
 # ctk.CTkButton(master=sidebar, text="  K-means", fg_color="#090909", font=(
 #     "Arial Bold", 15), anchor="w", corner_radius=10, hover_color="#5992FC", 
-              command=segmentacion_k_means).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
+            #   command=segmentacion_k_means).pack(fill="x", ipady=5, pady=(10, 0), padx=(20, 0))
 
 ##################### VISTA PRINCIPAL #####################
 # main_view = ctk.CTkFrame(master=app, width=configuration_App.get_main_view_width(),
@@ -426,70 +426,70 @@ def segmentacion_k_means():
 
 ################### VISTA LATERAL PARA SEGMENTACIONES ####################
 # UMBRALIZACIÓN
-lateral_view_umbralizacion = ctk.CTkFrame(master=app, width=250,
-                                          height=configuration_App.APP_HEIGHT, fg_color="transparent", corner_radius=20)
-lateral_view_umbralizacion.pack_propagate(0)
+# lateral_view_umbralizacion = ctk.CTkFrame(master=app, width=250,
+                                        #   height=configuration_App.APP_HEIGHT, fg_color="transparent", corner_radius=20)
+# lateral_view_umbralizacion.pack_propagate(0)
 # lateral_view.pack(side="left", padx=(0, 20), pady=20)
 
 
-def seg_thresholding():
-    tau = int(slider_umbralizacion_tau.get())
-    # print(slider_umbralizacion_delta_tau.get())
-    delta_tau = round(slider_umbralizacion_delta_tau.get(), 1)
-    print("tau:", tau, "delta_tau", delta_tau)
-    temp_img = segmentacion.thresholding(tau, delta_tau)
-    app_Status.set_app_img_main(temp_img)
-    updateImageView()
+# def seg_thresholding():
+#     tau = int(slider_umbralizacion_tau.get())
+#     # print(slider_umbralizacion_delta_tau.get())
+#     delta_tau = round(slider_umbralizacion_delta_tau.get(), 1)
+#     print("tau:", tau, "delta_tau", delta_tau)
+#     temp_img = segmentacion.thresholding(tau, delta_tau)
+#     app_Status.set_app_img_main(temp_img)
+#     updateImageView()
 
-pack
-label_umbralización = ctk.CTkLabel(lateral_view_umbralizacion, text="UMBRALIZACIÓN",
-                                   fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
+# pack
+# label_umbralización = ctk.CTkLabel(lateral_view_umbralizacion, text="UMBRALIZACIÓN",
+#                                    fg_color="transparent", text_color="#ffffff", justify="center", font=("Arial Bold", 20)).pack(fill="x", pady=20)
 
-# Label y slider para tau
-label_umbralización_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="Tau inicial",
-                                       fg_color="transparent", text_color="#ffffff", justify="left", font=("Arial Bold", 15)).pack(fill="x", pady=20)
+# # Label y slider para tau
+# label_umbralización_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="Tau inicial",
+#                                        fg_color="transparent", text_color="#ffffff", justify="left", font=("Arial Bold", 15)).pack(fill="x", pady=20)
 
-slider_label_umbralizacion_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="0", fg_color="#0C5EF7",
-                                              text_color="#ffffff", justify="center", width=40, corner_radius=5)
-slider_label_umbralizacion_tau.pack_propagate(0)
-slider_label_umbralizacion_tau.pack(pady=(10, 5))
-
-
-def slider_event_tau(value):
-    slider_label_umbralizacion_tau.configure(text=int(value))
+# slider_label_umbralizacion_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="0", fg_color="#0C5EF7",
+#                                               text_color="#ffffff", justify="center", width=40, corner_radius=5)
+# slider_label_umbralizacion_tau.pack_propagate(0)
+# slider_label_umbralizacion_tau.pack(pady=(10, 5))
 
 
-slider_tau = ctk.CTkSlider(lateral_view_umbralizacion, from_=0, to=100,
-                           variable=slider_umbralizacion_tau, command=slider_event_tau)
-slider_tau.set(0)
-slider_tau.pack_propagate(0)
-slider_tau.pack(pady=(10, 30))
-
-# Label y slider para delta tau
-label_umbralización_delta_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="Delta tau",
-                                             fg_color="transparent", text_color="#ffffff", justify="left", font=("Arial Bold", 15)).pack(fill="x", pady=20)
-
-slider_label_umbralizacion_delta_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="0", fg_color="#0C5EF7",
-                                                    text_color="#ffffff", justify="center", width=40, corner_radius=5)
-slider_label_umbralizacion_delta_tau.pack_propagate(0)
-slider_label_umbralizacion_delta_tau.pack(pady=(10, 5))
+# def slider_event_tau(value):
+#     slider_label_umbralizacion_tau.configure(text=int(value))
 
 
-def slider_event_delta_tau(value):
-    slider_label_umbralizacion_delta_tau.configure(text=round(value, 1))
+# slider_tau = ctk.CTkSlider(lateral_view_umbralizacion, from_=0, to=100,
+#                            variable=slider_umbralizacion_tau, command=slider_event_tau)
+# slider_tau.set(0)
+# slider_tau.pack_propagate(0)
+# slider_tau.pack(pady=(10, 30))
+
+# # Label y slider para delta tau
+# label_umbralización_delta_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="Delta tau",
+#                                              fg_color="transparent", text_color="#ffffff", justify="left", font=("Arial Bold", 15)).pack(fill="x", pady=20)
+
+# slider_label_umbralizacion_delta_tau = ctk.CTkLabel(lateral_view_umbralizacion, text="0", fg_color="#0C5EF7",
+#                                                     text_color="#ffffff", justify="center", width=40, corner_radius=5)
+# slider_label_umbralizacion_delta_tau.pack_propagate(0)
+# slider_label_umbralizacion_delta_tau.pack(pady=(10, 5))
 
 
-slider_delta_tau = ctk.CTkSlider(lateral_view_umbralizacion, from_=0, to=10,
-                                 variable=slider_umbralizacion_delta_tau, command=slider_event_delta_tau)
-slider_delta_tau.set(0)
-slider_delta_tau.pack_propagate(0)
-slider_delta_tau.pack(pady=(10, 30))
+# def slider_event_delta_tau(value):
+#     slider_label_umbralizacion_delta_tau.configure(text=round(value, 1))
 
-thresholding_button = ctk.CTkButton(master=lateral_view_umbralizacion, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
-    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=seg_thresholding).pack(fill="x", pady=20)
 
-thresholding_save = ctk.CTkButton(master=lateral_view_umbralizacion, text="Guardar segmentación", fg_color="#5992FC", font=(
-    "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
+# slider_delta_tau = ctk.CTkSlider(lateral_view_umbralizacion, from_=0, to=10,
+#                                  variable=slider_umbralizacion_delta_tau, command=slider_event_delta_tau)
+# slider_delta_tau.set(0)
+# slider_delta_tau.pack_propagate(0)
+# slider_delta_tau.pack(pady=(10, 30))
+
+# thresholding_button = ctk.CTkButton(master=lateral_view_umbralizacion, text="Ejecutar algoritmo", fg_color="#0C5EF7", font=(
+#     "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#5992FC", command=seg_thresholding).pack(fill="x", pady=20)
+
+# thresholding_save = ctk.CTkButton(master=lateral_view_umbralizacion, text="Guardar segmentación", fg_color="#5992FC", font=(
+#     "Arial Bold", 15), anchor="center", corner_radius=10, hover_color="#0C5EF7", command=save_image_nii).pack(fill="x", pady=20)
 
 # CRECIMIENTO DE REGIONES
 lateral_view_regiones = ctk.CTkFrame(master=app, width=250,

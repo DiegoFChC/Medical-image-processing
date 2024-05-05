@@ -3,7 +3,8 @@ import numpy as np
 
 class App_Status:
     def __init__(self):
-        self.current_process = "umbralización"
+        self.current_process = "thresholding"
+        self.process_views = []
         self.draw = False
         self.current_depth = 0
         self.draw_x_prev = None
@@ -40,6 +41,9 @@ class App_Status:
 
     def get_app_img_main(self):
         return self.app_img_main
+    
+    def get_process_views(self):
+        return self.process_views
 
     # Setters (mutator methods)
     def set_current_process(self, new_segmentation):
@@ -73,6 +77,9 @@ class App_Status:
 
     def set_app_img_main(self, new_image):
         self.app_img_main = new_image
+
+    def add_process_view(self, process):
+        self.process_views.append(process)
 
     def reset_coordinates_draw(self, event):
         self.set_draw_x_prev(None)

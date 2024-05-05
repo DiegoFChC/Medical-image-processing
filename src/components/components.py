@@ -4,13 +4,21 @@ import tkinter as tk
 
 
 class Frame:
-    def __init__(self, ctk, master, width, height, fg_color):
+    def __init__(self, ctk, master, width, height, fg_color, padx = 20, process_name = 'none'):
+        self.padx= padx
+        self.process_name = process_name
         self.frame = ctk.CTkFrame(master=master, width=width, height=height,
                                   fg_color=fg_color, corner_radius=20)
         self.frame.pack_propagate(0)
 
     def get_frame(self):
         return self.frame
+    
+    def get_process_name(self):
+        return self.process_name
+    
+    def set_width_frame(self, new_width):
+        self.frame.configure(width= new_width)
 
     def show_frame(self):
         self.frame.pack_propagate(0)
@@ -21,7 +29,7 @@ class Frame:
 
     def show_frame_custom(self):
         self.frame.pack_propagate(0)
-        self.frame.pack(side='left', padx=20, pady=20)
+        self.frame.pack(side='left', padx=(self.padx, 20), pady=20)
 
     def show_sidebar(self):
         self.frame.pack_propagate(0)
