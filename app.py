@@ -13,6 +13,12 @@ import src.components.components as comp
 from src.algorithms.segmentation.thresholding import thresholding
 from src.algorithms.segmentation.region_growing import region_growing
 from src.algorithms.segmentation.k_means import k_means
+from src.algorithms.intensity_standardization.z_score import z_score
+from src.algorithms.intensity_standardization.intensity_rescaling import intensity_rescaling
+from src.algorithms.intensity_standardization.white_stripe import white_stripe
+from src.algorithms.intensity_standardization.histogram_matching import histogram_matching
+from src.algorithms.noise_removal.mean_filter import mean_filter
+from src.algorithms.noise_removal.median_filter import median_filter
 
 # APP STATE
 configuration_App = Configuration_App()
@@ -33,9 +39,9 @@ pheight = round(((htotal-configuration_App.APP_HEIGHT)/2))
 
 app.geometry(f"{configuration_App.APP_WIDTH}x{configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
 app.resizable(0, 0)
-app.title("PROCESAMIENTO DE IMÁGENES MÉDICAS")
+app.title("MEDICAL IMAGE PROCESSING")
 app.configure(fg_color=configuration_App.BACKGROUND_COLOR)
-# app.iconbitmap("src/icons/icon.ico")
+app.iconbitmap("src/icons/icon.ico")
 
 ###########################################################################
 #                             CONTROL VARIABLES                           #
@@ -51,6 +57,12 @@ var_region_growing_slider_tolerance = tk.IntVar(value=0)
 var_region_growing_slider_iterations = tk.IntVar(value=0)
 # K-means
 var_k_means_slider_iterations = tk.IntVar(value=0)
+# Z-Score
+var_z_score_slider_background_intensity = tk.IntVar(value=0)
+# White stripe
+var_white_stripe_slider_threshold = tk.IntVar(value=0)
+# Histogram matching
+var_histogram_matching_slider_k = tk.IntVar(value=0)
 
 
 ###########################################################################
@@ -58,19 +70,25 @@ var_k_means_slider_iterations = tk.IntVar(value=0)
 ###########################################################################
 
 
-def upload_image():
+def upload_image(is_main):
     file_url = tk.filedialog.askopenfilename()
 
     if file_url:
-        # Procesar el archivo
-        x, y, z, img = algorithm_Status.upload_img_nii(file_url)
-        app_Status.set_app_img_main(img)
-        app_Status.set_canvas_size_x_y_z(x, y, z)
-        container_img_upload_nii.hide_frame()
-        main_view_edition_nii.show_frame_custom()
-        algorithm_Status.reset_annotated_array()
-        canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(
-        ), app_Status.get_app_img_main(), 'coronal', 0, app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
+        if is_main:
+            # Procesar el archivo
+            x, y, z, img = algorithm_Status.upload_img_nii(file_url)
+            app_Status.set_app_img_main(img)
+            app_Status.set_canvas_size_x_y_z(x, y, z)
+            container_img_upload_nii.hide_frame()
+            main_view_edition_nii.show_frame_custom()
+            algorithm_Status.reset_annotated_array()
+            canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(), app_Status.get_app_img_main(), 'coronal', 0, app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
+            print('Imagen principal cargada!!!')
+        else:
+            img = nib.load(file_url)
+            img = img.get_fdata()
+            algorithm_Status.set_img_secondary(img)
+            print('Imagen secundaria cargada!!!')
     else:
         print("No se seleccionó ningún archivo")
 
@@ -108,9 +126,6 @@ def draw_on_img():
         canvas_label_slider.show_label()
         canvas_slider.show_slider()
         button_select_edition_mode.show_button()
-
-def save_new_img_nii(name):
-    app_Status.save_image_nii(name)
 
 def activate_upload():
 
@@ -162,12 +177,15 @@ label_img_logo.show_label()
 img_btn_start = Image.open("src/icons/home.png")
 img_btn_start_upload = comp.Image_Upload(ctk, img_btn_start, 20, 20)
 btn_start = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Start", img_btn_start_upload.get_image(
-), '#090909', '#0C5EF7', activate_upload, 0, 5, [0, 0], [60, 0])
+), '#090909', '#0C5EF7', activate_upload, 0, 5, [0, 0], [30, 0])
 btn_start.show_button()
+
+
+
 
 # SECTION 2: SEGMENTATION
 # Segmentation button
-img_btn_segmentation = Image.open('src/icons/seg.png')
+img_btn_segmentation = Image.open('src/icons/split.png')
 img_btn_segmentation_upload = comp.Image_Upload(
     ctk, img_btn_segmentation, 20, 20)
 btn_segmentation = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Segmentation", img_btn_segmentation_upload.get_image(
@@ -195,6 +213,65 @@ btn_segmentation_k_means = comp.Button_Sidebar(ctk, sidebar.get_frame(), "K-mean
 btn_segmentation_k_means.show_button()
 
 
+
+
+# SECTION 3: INTENSITY STANDARIZATION
+# Intensity standardization button
+img_btn_intensity_standardization = Image.open('src/icons/stand.png')
+img_btn_intensity_standardization_upload = comp.Image_Upload(
+    ctk, img_btn_intensity_standardization, 20, 20)
+btn_intensity_standardization = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Intensity Standardization", img_btn_intensity_standardization_upload.get_image(
+), '#090909', '#0C5EF7', lambda: change_page('z_score'), 0, 5, [0, 0], [20, 0])
+btn_intensity_standardization.show_button()
+
+# SUB-SECTION
+
+# Z-score button
+btn_intensity_standarization_z_score = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Z-Score", img_btn_sub_section_upload.get_image(
+), '#090909', '#5992FC', lambda: change_page('z_score'), 0, 5, [20, 0], [10, 0])
+btn_intensity_standarization_z_score.show_button()
+
+# Intensity rescaling button
+btn_intensity_standarization_intensity_rescaling = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Intensity Rescaling", img_btn_sub_section_upload.get_image(
+), '#090909', '#5992FC', lambda: change_page('intensity_rescaling'), 0, 5, [20, 0], [10, 0])
+btn_intensity_standarization_intensity_rescaling.show_button()
+
+# White stripe button
+btn_intensity_standarization_white_stripe = comp.Button_Sidebar(ctk, sidebar.get_frame(), "White Stripe", img_btn_sub_section_upload.get_image(
+), '#090909', '#5992FC', lambda: change_page('white_stripe'), 0, 5, [20, 0], [10, 0])
+btn_intensity_standarization_white_stripe.show_button()
+
+# Histogram Matching button
+btn_intensity_standarization_histogram_matching = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Histogram Matching", img_btn_sub_section_upload.get_image(
+), '#090909', '#5992FC', lambda: change_page('histogram_matching'), 0, 5, [20, 0], [10, 0])
+btn_intensity_standarization_histogram_matching.show_button()
+
+
+
+
+# SECTION 4: NOISE REMOVAL
+# Noise removal button
+img_btn_noise_removal = Image.open('src/icons/noise.png')
+img_btn_noise_removal_upload = comp.Image_Upload(
+    ctk, img_btn_noise_removal, 20, 20)
+btn_noise_removal = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Noise Removal", img_btn_noise_removal_upload.get_image(
+), '#090909', '#0C5EF7', lambda: change_page('mean_filter'), 0, 5, [0, 0], [20, 0])
+btn_noise_removal.show_button()
+
+# SUB-SECTION
+
+# Mean filter button
+btn_noise_removal_mean_filter = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Mean Filter", img_btn_sub_section_upload.get_image(
+), '#090909', '#5992FC', lambda: change_page('mean_filter'), 0, 5, [20, 0], [10, 0])
+btn_noise_removal_mean_filter.show_button()
+
+# Median filter button
+btn_noise_removal_median_filter = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Median Filter", img_btn_sub_section_upload.get_image(
+), '#090909', '#5992FC', lambda: change_page('median_filter'), 0, 5, [20, 0], [10, 0])
+btn_noise_removal_median_filter.show_button()
+
+
+
 ###########################################################################
 #                                MAIN VIEW                                #
 ###########################################################################
@@ -217,7 +294,7 @@ main_view_edition_nii = comp.Frame(ctk, main_view.get_frame(
 
 # Button that upload .nii images
 btn_upload_nii = comp.Button_Upload(ctk, container_img_upload_nii.get_frame(
-), "Upload image", img_upload_nii_upload.get_image(), '#0C5EF7', '#5992FC', upload_image, 0, 0, [0, 0], [390, 0], 100, 100, 'top')
+), "Upload image", img_upload_nii_upload.get_image(), '#0C5EF7', '#5992FC', lambda: upload_image(True), 0, 0, [0, 0], [390, 0], 100, 100, 'top')
 btn_upload_nii.show_button()
 
 # Options menu for view type
@@ -268,8 +345,10 @@ button_select_edition_mode = comp.Button(ctk, main_view_edition_nii.get_frame(
 button_select_edition_mode.show_button()
 
 button_save_annotations = comp.Button(ctk, main_view_edition_nii.get_frame(
-), 'Save annotations to new .nii file', 300, algorithm_Status.export_annotations)
+), 'Save annotations to new .nii file', 300, lambda: algorithm_Status.export_annotations(app_Status.get_current_process()))
 # button_save_annotations.show_button()
+
+
 
 
 ###########################################################################
@@ -327,10 +406,8 @@ thresholding_slider_tau_delta.show_slider()
 thresholding_button_run = comp.Button(ctk, side_view_thresholding.get_frame(), 'Run algorithm', 100, segmentation_thresholding)
 thresholding_button_run.show_button_custom()
 
-thresholding_button_save = comp.Button(ctk, side_view_thresholding.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('thresholding'))
+thresholding_button_save = comp.Button(ctk, side_view_thresholding.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('thresholding'))
 thresholding_button_save.show_button_custom()
-
-
 
 
 
@@ -387,13 +464,13 @@ region_growing_slider_iterations.show_slider()
 region_growing_button_run = comp.Button(ctk, side_view_region_growing.get_frame(), 'Run algorithm', 100, segmentation_region_growing)
 region_growing_button_run.show_button_custom()
 
-region_growing_button_save = comp.Button(ctk, side_view_region_growing.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('region_growing'))
+region_growing_button_save = comp.Button(ctk, side_view_region_growing.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('region_growing'))
 region_growing_button_save.show_button_custom()
 
 
 
 
-# -------------------------- Region Growing ------------------------------
+# ---------------------------- K-means ------------------------------
 side_view_k_means = comp.Frame(ctk, app, configuration_App.get_help_view_width(
 ), configuration_App.APP_HEIGHT, 'transparent', 0, 'k_means')
 side_view_k_means.show_frame_custom()
@@ -430,8 +507,218 @@ k_means_slider_iterations.show_slider()
 k_means_button_run = comp.Button(ctk, side_view_k_means.get_frame(), 'Run algorithm', 100, segmentation_k_means)
 k_means_button_run.show_button_custom()
 
-k_means_button_save = comp.Button(ctk, side_view_k_means.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('k_means'))
+k_means_button_save = comp.Button(ctk, side_view_k_means.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('k_means'))
 k_means_button_save.show_button_custom()
+
+
+
+
+# ------------------------------ Z-Score ------------------------------
+side_view_z_score = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'z_score')
+side_view_z_score.show_frame_custom()
+app_Status.add_process_view(side_view_z_score)
+
+
+def intensity_standarization_z_score():
+    background_intensity = int(var_z_score_slider_background_intensity.get())
+    new_img = z_score(background_intensity, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+z_score_label_title = comp.Label_Simple(
+    ctk, side_view_z_score.get_frame(), 'Z-SCORE', 20)
+z_score_label_title.show_label()
+
+# Label background intensity
+z_score_label_background_intensity = comp.Label_Simple(
+    ctk, side_view_z_score.get_frame(), 'Background intensity', 15)
+z_score_label_background_intensity.show_label()
+
+# Label and slider background intensity
+z_score_label_slider_background_intensity = comp.Label_Text_Slider(
+    ctk, side_view_z_score.get_frame(), '0', 40, 5)
+z_score_label_slider_background_intensity.show_label()
+
+z_score_slider_background_intensity = comp.Slider(ctk, side_view_z_score.get_frame(
+), 0, 100, lambda value: z_score_label_slider_background_intensity.set_value_label(int(value)), var_z_score_slider_background_intensity)
+z_score_slider_background_intensity.show_slider()
+
+# Buttons
+z_score_button_run = comp.Button(ctk, side_view_z_score.get_frame(), 'Run algorithm', 100, intensity_standarization_z_score)
+z_score_button_run.show_button_custom()
+
+z_score_button_save = comp.Button(ctk, side_view_z_score.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('z_score'))
+z_score_button_save.show_button_custom()
+
+
+
+
+# ------------------------------ Intensity rescaling ------------------------------
+side_view_intensity_rescaling = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'intensity_rescaling')
+side_view_intensity_rescaling.show_frame_custom()
+app_Status.add_process_view(side_view_intensity_rescaling)
+
+
+def intensity_standarization_intensity_rescaling():
+    new_img = intensity_rescaling(algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+intensity_rescaling_label_title = comp.Label_Simple(
+    ctk, side_view_intensity_rescaling.get_frame(), 'INTENSITY RESCALING', 20)
+intensity_rescaling_label_title.show_label()
+
+# Buttons
+intensity_rescaling_button_run = comp.Button(ctk, side_view_intensity_rescaling.get_frame(), 'Run algorithm', 100, intensity_standarization_intensity_rescaling)
+intensity_rescaling_button_run.show_button_custom()
+
+intensity_rescaling_button_save = comp.Button(ctk, side_view_intensity_rescaling.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('intensity_rescaling'))
+intensity_rescaling_button_save.show_button_custom()
+
+
+
+
+# ------------------------------ White stripe ------------------------------
+side_view_white_stripe = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'white_stripe')
+side_view_white_stripe.show_frame_custom()
+app_Status.add_process_view(side_view_white_stripe)
+
+
+def intensity_standarization_white_stripe():
+    threshold = int(var_white_stripe_slider_threshold.get())
+    new_img = white_stripe(threshold, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+white_stripe_label_title = comp.Label_Simple(
+    ctk, side_view_white_stripe.get_frame(), 'WHITE STRIPE', 20)
+white_stripe_label_title.show_label()
+
+# Label threshold
+white_stripe_label_threshold = comp.Label_Simple(
+    ctk, side_view_white_stripe.get_frame(), 'Threshold', 15)
+white_stripe_label_threshold.show_label()
+
+# Label and slider background intensity
+white_stripe_label_slider_threshold = comp.Label_Text_Slider(
+    ctk, side_view_white_stripe.get_frame(), '0', 40, 5)
+white_stripe_label_slider_threshold.show_label()
+
+white_stripe_slider_threshold = comp.Slider(ctk, side_view_white_stripe.get_frame(
+), 0, 200, lambda value: white_stripe_label_slider_threshold.set_value_label(int(value)), var_white_stripe_slider_threshold)
+white_stripe_slider_threshold.show_slider()
+
+# Buttons
+white_stripe_button_run = comp.Button(ctk, side_view_white_stripe.get_frame(), 'Run algorithm', 100, intensity_standarization_white_stripe)
+white_stripe_button_run.show_button_custom()
+
+white_stripe_button_save = comp.Button(ctk, side_view_white_stripe.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('white_stripe'))
+white_stripe_button_save.show_button_custom()
+
+
+
+
+# ------------------------------ Histogram matching ------------------------------
+side_view_histogram_matching = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'histogram_matching')
+side_view_histogram_matching.show_frame_custom()
+app_Status.add_process_view(side_view_histogram_matching)
+
+
+def intensity_standarization_histogram_matching():
+    k = var_histogram_matching_slider_k.get()
+    new_img = histogram_matching(algorithm_Status.get_img_secondary(), algorithm_Status.get_img_main(), k)
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+histogram_matching_label_title = comp.Label_Simple(
+    ctk, side_view_histogram_matching.get_frame(), 'HISTOGRAM MATCHING', 20)
+histogram_matching_label_title.show_label()
+
+# Button that upload .nii images
+btn_upload_nii_histogram_matching = comp.Button_Upload(ctk, side_view_histogram_matching.get_frame(
+), "Upload training image", img_upload_nii_upload.get_image(), '#0C5EF7', '#5992FC', lambda: upload_image(False), 0, 0, [0, 0], [0, 0], 100, 100, 'top')
+btn_upload_nii_histogram_matching.show_button()
+
+# Label k
+histogram_matching_label_k = comp.Label_Simple(
+    ctk, side_view_histogram_matching.get_frame(), 'K', 15)
+histogram_matching_label_k.show_label()
+
+# Label and slider background intensity
+histogram_matching_label_slider_k = comp.Label_Text_Slider(
+    ctk, side_view_histogram_matching.get_frame(), '0', 40, 5)
+histogram_matching_label_slider_k.show_label()
+
+histogram_matching_slider_k = comp.Slider(ctk, side_view_histogram_matching.get_frame(
+), 0, 10, lambda value: histogram_matching_label_slider_k.set_value_label(int(value)), var_histogram_matching_slider_k)
+histogram_matching_slider_k.show_slider()
+
+# Buttons
+histogram_matching_button_run = comp.Button(ctk, side_view_histogram_matching.get_frame(), 'Run algorithm', 100, intensity_standarization_histogram_matching)
+histogram_matching_button_run.show_button_custom()
+
+histogram_matching_button_save = comp.Button(ctk, side_view_histogram_matching.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('histogram_matching'))
+histogram_matching_button_save.show_button_custom()
+
+
+
+
+# ------------------------------ Mean filter ------------------------------
+side_view_mean_filter = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'mean_filter')
+side_view_mean_filter.show_frame_custom()
+app_Status.add_process_view(side_view_mean_filter)
+
+
+def intensity_standarization_mean_filter():
+    new_img = mean_filter(3, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+mean_filter_label_title = comp.Label_Simple(
+    ctk, side_view_mean_filter.get_frame(), 'MEAN FILTER', 20)
+mean_filter_label_title.show_label()
+
+# Buttons
+mean_filter_button_run = comp.Button(ctk, side_view_mean_filter.get_frame(), 'Run algorithm', 100, intensity_standarization_mean_filter)
+mean_filter_button_run.show_button_custom()
+
+mean_filter_button_save = comp.Button(ctk, side_view_mean_filter.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('mean_filter'))
+mean_filter_button_save.show_button_custom()
+
+
+# ------------------------------ Median filter ------------------------------
+side_view_median_filter = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'median_filter')
+side_view_median_filter.show_frame_custom()
+app_Status.add_process_view(side_view_median_filter)
+
+
+def intensity_standarization_median_filter():
+    new_img = median_filter(3, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+median_filter_label_title = comp.Label_Simple(
+    ctk, side_view_median_filter.get_frame(), 'MEDIAN FILTER', 20)
+median_filter_label_title.show_label()
+
+# Buttons
+median_filter_button_run = comp.Button(ctk, side_view_median_filter.get_frame(), 'Run algorithm', 100, intensity_standarization_median_filter)
+median_filter_button_run.show_button_custom()
+
+median_filter_button_save = comp.Button(ctk, side_view_median_filter.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('median_filter'))
+median_filter_button_save.show_button_custom()
 
 
 
