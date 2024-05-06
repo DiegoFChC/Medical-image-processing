@@ -11,6 +11,8 @@ from src.components.algorithm_status import Algorithm_Status
 import src.components.components as comp
 # Algorithms
 from src.algorithms.segmentation.thresholding import thresholding
+from src.algorithms.segmentation.region_growing import region_growing
+from src.algorithms.segmentation.k_means import k_means
 
 # APP STATE
 configuration_App = Configuration_App()
@@ -188,7 +190,7 @@ btn_segmentation_region_growing = comp.Button_Sidebar(ctk, sidebar.get_frame(), 
 btn_segmentation_region_growing.show_button()
 
 # Region k means
-btn_segmentation_k_means = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Region growing", img_btn_sub_section_upload.get_image(
+btn_segmentation_k_means = comp.Button_Sidebar(ctk, sidebar.get_frame(), "K-means", img_btn_sub_section_upload.get_image(
 ), '#090909', '#5992FC', lambda: change_page('k_means'), 0, 5, [20, 0], [10, 0])
 btn_segmentation_k_means.show_button()
 
@@ -236,7 +238,7 @@ canvas_label_slider.show_label()
 
 
 def canvas_slider_event(value):
-    canvas_label_slider.set_value_label(value)
+    canvas_label_slider.set_value_label(math.floor(value))
     updateImageView()
 
 
@@ -318,7 +320,7 @@ thresholding_label_slider_tau_delta = comp.Label_Text_Slider(
 thresholding_label_slider_tau_delta.show_label()
 
 thresholding_slider_tau_delta = comp.Slider(ctk, side_view_thresholding.get_frame(
-), 0, 10, lambda value: thresholding_label_slider_tau_delta.set_value_label(round(value, 1)), var_thresholding_slider_delta_tau)
+), 0, 2, lambda value: thresholding_label_slider_tau_delta.set_value_label(round(value, 1)), var_thresholding_slider_delta_tau)
 thresholding_slider_tau_delta.show_slider()
 
 # Buttons
@@ -327,6 +329,111 @@ thresholding_button_run.show_button_custom()
 
 thresholding_button_save = comp.Button(ctk, side_view_thresholding.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('thresholding'))
 thresholding_button_save.show_button_custom()
+
+
+
+
+
+
+# -------------------------- Region Growing ------------------------------
+side_view_region_growing = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'region_growing')
+side_view_region_growing.show_frame_custom()
+app_Status.add_process_view(side_view_region_growing)
+
+
+def segmentation_region_growing():
+    tolerance = var_region_growing_slider_tolerance.get()
+    starting_point = (100, 25, 125)
+    iterations = var_region_growing_slider_iterations.get()
+    new_img = region_growing(tolerance, starting_point, iterations, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+region_growing_label_title = comp.Label_Simple(
+    ctk, side_view_region_growing.get_frame(), 'REGION GROWING', 20)
+region_growing_label_title.show_label()
+
+# Label tolerance
+region_growing_label_tolerance = comp.Label_Simple(
+    ctk, side_view_region_growing.get_frame(), 'Tolerance', 15)
+region_growing_label_tolerance.show_label()
+
+# Label and slider tolerance
+region_growing_label_slider_tolerance = comp.Label_Text_Slider(
+    ctk, side_view_region_growing.get_frame(), '0', 40, 5)
+region_growing_label_slider_tolerance.show_label()
+
+region_growing_slider_tolerance = comp.Slider(ctk, side_view_region_growing.get_frame(
+), 0, 200, lambda value: region_growing_label_slider_tolerance.set_value_label(int(value)), var_region_growing_slider_tolerance)
+region_growing_slider_tolerance.show_slider()
+
+# Label iterations
+region_growing_label_iterations = comp.Label_Simple(
+    ctk, side_view_region_growing.get_frame(), 'Iterations', 15)
+region_growing_label_iterations.show_label()
+
+# Label and slider tolerance
+region_growing_label_slider_iterations = comp.Label_Text_Slider(
+    ctk, side_view_region_growing.get_frame(), '0', 40, 5)
+region_growing_label_slider_iterations.show_label()
+
+region_growing_slider_iterations = comp.Slider(ctk, side_view_region_growing.get_frame(
+), 0, 20000, lambda value: region_growing_label_slider_iterations.set_value_label(int(value)), var_region_growing_slider_iterations)
+region_growing_slider_iterations.show_slider()
+
+# Buttons
+region_growing_button_run = comp.Button(ctk, side_view_region_growing.get_frame(), 'Run algorithm', 100, segmentation_region_growing)
+region_growing_button_run.show_button_custom()
+
+region_growing_button_save = comp.Button(ctk, side_view_region_growing.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('region_growing'))
+region_growing_button_save.show_button_custom()
+
+
+
+
+# -------------------------- Region Growing ------------------------------
+side_view_k_means = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'k_means')
+side_view_k_means.show_frame_custom()
+app_Status.add_process_view(side_view_k_means)
+
+
+def segmentation_k_means():
+    centroids = [(110, 75, 125), (80, 12, 125), (110, 100, 125)]
+    iterations = var_k_means_slider_iterations.get()
+    new_img = k_means(iterations, centroids, algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+k_means_label_title = comp.Label_Simple(
+    ctk, side_view_k_means.get_frame(), 'K-MEANS', 20)
+k_means_label_title.show_label()
+
+# Label iterations
+k_means_label_iterations = comp.Label_Simple(
+    ctk, side_view_k_means.get_frame(), 'Iterations', 15)
+k_means_label_iterations.show_label()
+
+# Label and slider tolerance
+k_means_label_slider_iterations = comp.Label_Text_Slider(
+    ctk, side_view_k_means.get_frame(), '0', 40, 5)
+k_means_label_slider_iterations.show_label()
+
+k_means_slider_iterations = comp.Slider(ctk, side_view_k_means.get_frame(
+), 0, 100, lambda value: k_means_label_slider_iterations.set_value_label(int(value)), var_k_means_slider_iterations)
+k_means_slider_iterations.show_slider()
+
+# Buttons
+k_means_button_run = comp.Button(ctk, side_view_k_means.get_frame(), 'Run algorithm', 100, segmentation_k_means)
+k_means_button_run.show_button_custom()
+
+k_means_button_save = comp.Button(ctk, side_view_k_means.get_frame(), 'Save segmentation', 100, lambda: save_new_img_nii('k_means'))
+k_means_button_save.show_button_custom()
+
+
 
 ###########################################################################
 #                                MAIN LOOP                                #

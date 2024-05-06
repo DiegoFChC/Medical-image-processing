@@ -87,7 +87,7 @@ class Label_Text_Slider:
         return self.label
 
     def set_value_label(self, new_value):
-        self.label.configure(text=int(new_value))
+        self.label.configure(text=new_value)
 
     def show_label(self):
         self.label.pack_propagate(0)
