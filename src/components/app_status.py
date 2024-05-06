@@ -86,6 +86,7 @@ class App_Status:
         self.set_draw_y_prev(None)
     
     def save_image_nii(self, name):
-        img_uint8 = self.get_app_img_main().astype(np.uint8)
+        # img_uint8 = self.get_app_img_main().astype(np.uint8)
+        img_uint8 = self.get_app_img_main().astype(np.float32)
         nii_img = nib.Nifti1Image(img_uint8, affine=np.eye(4))
         nib.save(nii_img, f"src/saved_processes/{name}.nii")

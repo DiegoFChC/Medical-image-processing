@@ -79,8 +79,8 @@ class Algorithm_Status:
         maximo = np.max(matriz)
         return (matriz - minimo) / (maximo - minimo)
     
-    def export_annotations(self):
-        img_uint8 = self.annotated_array.astype(np.uint8)
+    def export_annotations(self, name):
+        img_uint8 = self.annotated_array.astype(np.float32)
         nii_img = nib.Nifti1Image(img_uint8, affine=np.eye(4))
-        nib.save(nii_img, "src/img_slides/anotation.nii")
+        nib.save(nii_img, f"src/saved_processes/anotation_{name}.nii")
     
