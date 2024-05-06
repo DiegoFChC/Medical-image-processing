@@ -6,6 +6,7 @@ import tkinter as tk
 class Algorithm_Status:
     def __init__(self):
         self.img_main = []
+        self.img_secondary = []
         self.annotated_array = []
         self.size_img_x = 0
         self.size_img_y = 0
@@ -16,6 +17,9 @@ class Algorithm_Status:
     # Getters (accessor methods)
     def get_img_main(self):
         return self.img_main
+    
+    def get_img_secondary(self):
+        return self.img_secondary
 
     def get_annotated_array(self):
         return self.annotated_array
@@ -38,7 +42,9 @@ class Algorithm_Status:
     # Setters (mutator methods)
     def set_img_main(self, new_image):
         self.img_main = new_image
-        
+    
+    def set_img_secondary(self, new_img):
+        self.img_secondary = new_img
     # def set_annotated_array(self, new_annotated_array):
     #     self.annotated_array = new_annotated_array
 

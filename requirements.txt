@@ -3,3 +3,4 @@ nibabel==5.2.1
 matplotlib==3.8.4
 customtkinter==5.2.2
 pillow
+scipy
