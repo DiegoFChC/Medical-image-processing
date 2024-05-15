@@ -138,18 +138,18 @@ class Label_Canvas:
         # Plano YZ -> Vista sagital
         # Plano XZ -> Vista axial
         if plano == "coronal":
-            aux_range1 = x
-            aux_range2 = y
+            aux_range1 = y
+            aux_range2 = x
             slider.configure(to=z)
             pil_image = Image.fromarray(img[:, :, deep])
         elif plano == "sagital":
-            aux_range1 = y
-            aux_range2 = z
+            aux_range1 = z
+            aux_range2 = y
             slider.configure(to=x)
             pil_image = Image.fromarray(img[deep, :, :])
         elif plano == "axial":
-            aux_range1 = x
-            aux_range2 = z
+            aux_range1 = z
+            aux_range2 = x
             slider.configure(to=y)
             pil_image = Image.fromarray(img[:, deep, :])
 

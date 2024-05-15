@@ -1,5 +1,6 @@
 import copy
 import numpy as np
+import scipy as sp
 
 def mean_filter(tamano_filtro, img_main):
     """
@@ -38,3 +39,14 @@ def mean_filter(tamano_filtro, img_main):
                 imagen_filtrada[i, j, k] = valor_promedio
     print("Fin de mean-filter!!!")
     return imagen_filtrada
+  
+def mean_filter_kernel(img_main):
+  imagen_3d = copy.deepcopy(img_main)
+  
+  # kernel_3d_1 = np.array([[[0, 1, 0,],[0, 1, 0,],[0, 1, 0,]], [[0, 1, 0,],[0, 1, 0,],[0, 1, 0,]], [[0, 1, 0,],[0, 1, 0,],[0, 1, 0,]]]) / 9
+  kernel_3d_3 = np.array([[[1, 1, 1,],[1, 1, 1,],[1, 1, 1,]], [[1, 1, 1,],[1, 1, 1,],[1, 1, 1,]], [[1, 1, 1,],[1, 1, 1,],[1, 1, 1,]]]) / 27
+  
+  img_3d_filt = sp.ndimage.convolve(imagen_3d, kernel_3d_3)
+  
+  return img_3d_filt
+    
