@@ -10,15 +10,22 @@ from src.components.app_status import App_Status
 from src.components.algorithm_status import Algorithm_Status
 import src.components.components as comp
 # Algorithms
+## Segmentation
 from src.algorithms.segmentation.thresholding import thresholding
 from src.algorithms.segmentation.region_growing import region_growing
 from src.algorithms.segmentation.k_means import k_means
+## Intensity standarization
 from src.algorithms.intensity_standardization.z_score import z_score
 from src.algorithms.intensity_standardization.intensity_rescaling import intensity_rescaling
 from src.algorithms.intensity_standardization.white_stripe import white_stripe
 from src.algorithms.intensity_standardization.histogram_matching import histogram_matching
+## Noise remove
 from src.algorithms.noise_removal.mean_filter import mean_filter
+from src.algorithms.noise_removal.mean_filter import mean_filter_kernel
 from src.algorithms.noise_removal.median_filter import median_filter
+## Edges
+from src.algorithms.edges.finite_differences import finite_differences
+from src.algorithms.edges.centered_differences import centered_differences
 
 # APP STATE
 configuration_App = Configuration_App()
@@ -69,6 +76,14 @@ var_histogram_matching_slider_k = tk.IntVar(value=0)
 #                          FLOW CONTROL FUNCTIONS                         #
 ###########################################################################
 
+def updateImageView():
+    if app_Status.get_draw():
+        canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(
+        ), app_Status.get_app_img_main(), option_menu_view_type_variable.get(), int(canvas_slider_variable.get()), app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
+    else:
+        canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(), app_Status.get_app_img_main(
+        ), option_menu_view_type_variable.get(), int(canvas_slider_variable.get()), app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
+
 
 def upload_image(is_main):
     file_url = tk.filedialog.askopenfilename()
@@ -83,6 +98,7 @@ def upload_image(is_main):
             main_view_edition_nii.show_frame_custom()
             algorithm_Status.reset_annotated_array()
             canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(), app_Status.get_app_img_main(), 'coronal', 0, app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
+            updateImageView()
             print('Imagen principal cargada!!!')
         else:
             img = nib.load(file_url)
@@ -91,15 +107,6 @@ def upload_image(is_main):
             print('Imagen secundaria cargada!!!')
     else:
         print("No se seleccionó ningún archivo")
-
-
-def updateImageView():
-    if app_Status.get_draw():
-        canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(
-        ), app_Status.get_app_img_main(), option_menu_view_type_variable.get(), int(canvas_slider_variable.get()), app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
-    else:
-        canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(), app_Status.get_app_img_main(
-        ), option_menu_view_type_variable.get(), int(canvas_slider_variable.get()), app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
 
 
 def draw_on_img():
@@ -271,6 +278,15 @@ btn_noise_removal_median_filter = comp.Button_Sidebar(ctk, sidebar.get_frame(), 
 btn_noise_removal_median_filter.show_button()
 
 
+
+# SECTION 5: EDGES
+# Noise removal button
+img_btn_edges = Image.open('src/icons/edges.png')
+img_btn_noise_edges = comp.Image_Upload(
+    ctk, img_btn_edges, 20, 20)
+btnedges = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Edges", img_btn_noise_edges.get_image(
+), '#090909', '#0C5EF7', lambda: change_page('edges'), 0, 5, [0, 0], [20, 0])
+btnedges.show_button()
 
 ###########################################################################
 #                                MAIN VIEW                                #
@@ -679,7 +695,7 @@ app_Status.add_process_view(side_view_mean_filter)
 
 
 def intensity_standarization_mean_filter():
-    new_img = mean_filter(3, algorithm_Status.get_img_main())
+    new_img = mean_filter_kernel(algorithm_Status.get_img_main())
     app_Status.set_app_img_main(new_img)
     updateImageView()
 
@@ -721,6 +737,39 @@ median_filter_button_save = comp.Button(ctk, side_view_median_filter.get_frame()
 median_filter_button_save.show_button_custom()
 
 
+
+
+# ------------------------------ Edges ------------------------------
+side_view_edges = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'edges')
+side_view_edges.show_frame_custom()
+app_Status.add_process_view(side_view_edges)
+
+
+def edges_finite_differences():
+    new_img = finite_differences(algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+def edges_centered_differences():
+    new_img = centered_differences(algorithm_Status.get_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+edges_label_title = comp.Label_Simple(
+    ctk, side_view_edges.get_frame(), 'EDGES', 20)
+edges_label_title.show_label()
+
+# Buttons
+edges_finite_differences_button_run = comp.Button(ctk, side_view_edges.get_frame(), 'Run finite differences', 100, edges_finite_differences)
+edges_finite_differences_button_run.show_button_custom()
+
+edges_centered_differences_button_run = comp.Button(ctk, side_view_edges.get_frame(), 'Run centered differences', 100, edges_centered_differences)
+edges_centered_differences_button_run.show_button_custom()
+
+edges_button_save = comp.Button(ctk, side_view_edges.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('edges'))
+edges_button_save.show_button_custom()
 
 ###########################################################################
 #                                MAIN LOOP                                #
