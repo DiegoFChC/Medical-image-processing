@@ -26,6 +26,10 @@ from src.algorithms.noise_removal.median_filter import median_filter
 ## Edges
 from src.algorithms.edges.finite_differences import finite_differences
 from src.algorithms.edges.centered_differences import centered_differences
+## Registration
+from src.algorithms.registration.registration import registration
+## Laplacian coordinates
+from src.algorithms.laplacian_coordinates.laplacian_coordinates import run_laplacian_coordinates
 
 # APP STATE
 configuration_App = Configuration_App()
@@ -44,7 +48,8 @@ pwidth = round(((wtotal-configuration_App.APP_WIDTH)/2))
 # pheight = round(((htotal-configuration_App.APP_HEIGHT)/2) - 65)
 pheight = round(((htotal-configuration_App.APP_HEIGHT)/2))
 
-app.geometry(f"{configuration_App.APP_WIDTH}x{configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
+# app.geometry(f"{configuration_App.APP_WIDTH}x{configuration_App.APP_HEIGHT}+{pwidth}+{pheight}")
+app.geometry(f"{configuration_App.APP_WIDTH}x{configuration_App.APP_HEIGHT}+{0}+{0}")
 app.resizable(0, 0)
 app.title("MEDICAL IMAGE PROCESSING")
 app.configure(fg_color=configuration_App.BACKGROUND_COLOR)
@@ -56,6 +61,7 @@ app.iconbitmap("src/icons/icon.ico")
 # Canvas
 canvas_slider_variable = tk.IntVar(value=0)
 option_menu_view_type_variable = tk.StringVar(value="coronal")
+option_menu_color_variable = tk.StringVar(value='red')
 # Thresholding
 var_thresholding_slider_tau = tk.IntVar(value=0)
 var_thresholding_slider_delta_tau = tk.DoubleVar(value=0)
@@ -99,11 +105,13 @@ def upload_image(is_main):
             algorithm_Status.reset_annotated_array()
             canvas_like_label.modify(app_Status.get_canvas_size_x(), app_Status.get_canvas_size_y(), app_Status.get_canvas_size_z(), app_Status.get_app_img_main(), 'coronal', 0, app_Status.get_draw(), canvas_draw.get_canvas(), app_Status, canvas_slider.get_slider())
             updateImageView()
+            algorithm_Status.set_url_img_main(file_url)
             print('Imagen principal cargada!!!')
         else:
             img = nib.load(file_url)
             img = img.get_fdata()
             algorithm_Status.set_img_secondary(img)
+            algorithm_Status.set_url_img_secondary(file_url)
             print('Imagen secundaria cargada!!!')
     else:
         print("No se seleccionó ningún archivo")
@@ -117,6 +125,7 @@ def draw_on_img():
         button_select_edition_mode.hide_button()
         button_save_annotations.hide_button()
         canvas_draw.show_canvas()
+        option_menu_color.show_option_menu()
         canvas_label_slider.show_label()
         canvas_slider.show_slider()
         button_select_edition_mode.show_button()
@@ -125,6 +134,7 @@ def draw_on_img():
         button_save_annotations.show_button()
     elif app_Status.get_draw() == False:
         canvas_draw.hide_canvas()
+        option_menu_color.hide_option_menu()
         canvas_label_slider.hide_label()
         canvas_slider.hide_slider()
         button_select_edition_mode.hide_button()
@@ -284,9 +294,32 @@ btn_noise_removal_median_filter.show_button()
 img_btn_edges = Image.open('src/icons/edges.png')
 img_btn_noise_edges = comp.Image_Upload(
     ctk, img_btn_edges, 20, 20)
-btnedges = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Edges", img_btn_noise_edges.get_image(
+btn_edges = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Edges", img_btn_noise_edges.get_image(
 ), '#090909', '#0C5EF7', lambda: change_page('edges'), 0, 5, [0, 0], [20, 0])
-btnedges.show_button()
+btn_edges.show_button()
+
+
+
+# SECTION 6: REGISTRATION
+# Registration button
+img_btn_registration = Image.open('src/icons/registro.png')
+img_btn_registration_upload = comp.Image_Upload(
+    ctk, img_btn_registration, 20, 20)
+btn_registration = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Registration", img_btn_registration_upload.get_image(
+), '#090909', '#0C5EF7', lambda: change_page('registration'), 0, 5, [0, 0], [20, 0])
+btn_registration.show_button()
+
+
+
+
+# SECTION 7: REGISTRATION
+# Laplacian button
+img_btn_laplacian = Image.open('src/icons/coordenada.png')
+img_btn_laplacian_upload = comp.Image_Upload(
+    ctk, img_btn_laplacian, 20, 20)
+btn_laplacian = comp.Button_Sidebar(ctk, sidebar.get_frame(), "Laplacian coordinates", img_btn_laplacian_upload.get_image(
+), '#090909', '#0C5EF7', lambda: change_page('laplacian_coordinates'), 0, 5, [0, 0], [20, 0])
+btn_laplacian.show_button()
 
 ###########################################################################
 #                                MAIN VIEW                                #
@@ -341,7 +374,14 @@ canvas_slider.show_slider()
 
 # Canvas to draw
 canvas_draw = comp.Canvas(
-    tk, main_view_edition_nii.get_frame(), 200, 200, option_menu_view_type_variable, app_Status, algorithm_Status)
+    tk, main_view_edition_nii.get_frame(), 200, 200, option_menu_view_type_variable, app_Status, algorithm_Status, 'red')
+
+def canvas_change_color():
+    print('Cambio de color a:', option_menu_color_variable.get())
+    canvas_draw.set_color(option_menu_color_variable.get())
+
+option_menu_color = comp.Option_Menu(ctk, main_view_edition_nii.get_frame(), [
+                                         "red", "white"], option_menu_color_variable, lambda x: canvas_change_color())
 
 # Select edition mode
 
@@ -649,6 +689,7 @@ app_Status.add_process_view(side_view_histogram_matching)
 
 def intensity_standarization_histogram_matching():
     k = var_histogram_matching_slider_k.get()
+    print("k:", k)
     new_img = histogram_matching(algorithm_Status.get_img_secondary(), algorithm_Status.get_img_main(), k)
     app_Status.set_app_img_main(new_img)
     updateImageView()
@@ -770,6 +811,82 @@ edges_centered_differences_button_run.show_button_custom()
 
 edges_button_save = comp.Button(ctk, side_view_edges.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('edges'))
 edges_button_save.show_button_custom()
+
+
+
+
+
+# ------------------------------ Registration ------------------------------
+side_view_registration = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'registration')
+side_view_registration.show_frame_custom()
+app_Status.add_process_view(side_view_registration)
+
+
+def registration_image():
+    new_img = registration(algorithm_Status.get_url_img_secondary(), algorithm_Status.get_url_img_main())
+    app_Status.set_app_img_main(new_img)
+    updateImageView()
+
+# Title
+registration_label_title = comp.Label_Simple(
+    ctk, side_view_registration.get_frame(), 'REGISTRATION', 20)
+registration_label_title.show_label()
+
+# Button that upload .nii images
+btn_upload_nii_registration = comp.Button_Upload(ctk, side_view_registration.get_frame(
+), "Upload fixed image", img_upload_nii_upload.get_image(), '#0C5EF7', '#5992FC', lambda: upload_image(False), 0, 0, [0, 0], [0, 0], 100, 100, 'top')
+btn_upload_nii_registration.show_button()
+
+# Buttons
+registration_button_run = comp.Button(ctk, side_view_registration.get_frame(), 'Run algorithm', 100, registration_image)
+registration_button_run.show_button_custom()
+
+registration_button_save = comp.Button(ctk, side_view_registration.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('registration'))
+registration_button_save.show_button_custom()
+
+
+
+
+
+
+
+# ------------------------------ Laplacian coordinates ------------------------------
+side_view_laplacian_coordinates = comp.Frame(ctk, app, configuration_App.get_help_view_width(
+), configuration_App.APP_HEIGHT, 'transparent', 0, 'laplacian_coordinates')
+side_view_laplacian_coordinates.show_frame_custom()
+app_Status.add_process_view(side_view_laplacian_coordinates)
+
+
+def laplacian_coordinates():
+    new_img = run_laplacian_coordinates(algorithm_Status.get_img_main(), algorithm_Status.get_annotated_array(), app_Status.get_current_depth(), option_menu_view_type_variable.get())
+    
+    
+    img_laplacian = app_Status.get_app_img_main()
+    if option_menu_view_type_variable.get() == 'coronal':
+        img_laplacian[:, :, app_Status.get_current_depth()] = new_img
+    elif option_menu_view_type_variable.get() == 'sagital':
+        img_laplacian[app_Status.get_current_depth(), :, :] = new_img
+    elif option_menu_view_type_variable.get() == 'axial':
+        img_laplacian[:, app_Status.get_current_depth(), :] = new_img
+    
+    
+    app_Status.set_app_img_main(img_laplacian)
+    updateImageView()
+
+# Title
+laplacian_label_title = comp.Label_Simple(
+    ctk, side_view_laplacian_coordinates.get_frame(), 'LAPLACIAN COORDINATES', 20)
+laplacian_label_title.show_label()
+
+# Buttons
+laplacian_button_run = comp.Button(ctk, side_view_laplacian_coordinates.get_frame(), 'Run algorithm', 100, laplacian_coordinates)
+laplacian_button_run.show_button_custom()
+
+laplacian_button_save = comp.Button(ctk, side_view_laplacian_coordinates.get_frame(), 'Save segmentation', 100, lambda: app_Status.save_image_nii('laplacian_coordinates'))
+laplacian_button_save.show_button_custom()
+
+
 
 ###########################################################################
 #                                MAIN LOOP                                #

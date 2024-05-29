@@ -13,6 +13,8 @@ class Algorithm_Status:
         self.size_img_z = 0
         self.max_value = 1
         self.min_value = 1
+        self.url_img_main = ""
+        self.url_img_secondary = ""
 
     # Getters (accessor methods)
     def get_img_main(self):
@@ -38,6 +40,12 @@ class Algorithm_Status:
 
     def get_min_value(self):
         return self.min_value
+    
+    def get_url_img_main(self):
+        return self.url_img_main
+    
+    def get_url_img_secondary(self):
+        return self.url_img_secondary
 
     # Setters (mutator methods)
     def set_img_main(self, new_image):
@@ -48,8 +56,12 @@ class Algorithm_Status:
     # def set_annotated_array(self, new_annotated_array):
     #     self.annotated_array = new_annotated_array
 
-    def set_annotated_array(self, x, y, z, array):
-        self.annotated_array[x, y, z] = array[x, y, z]
+    def set_annotated_array(self, x, y, z, array, color):
+        # self.annotated_array[x, y, z] = array[x, y, z]
+        if color == "red":
+            self.annotated_array[x, y, z] = 1
+        else:
+            self.annotated_array[x, y, z] = 2
         
     def reset_annotated_array(self):
         self.annotated_array = np.zeros_like(self.img_main, dtype=np.int8)
@@ -68,6 +80,12 @@ class Algorithm_Status:
 
     def set_min_value(self, new_min_value):
         self.min_value = new_min_value
+    
+    def set_url_img_main(self, new_url_img_main):
+        self.url_img_main = new_url_img_main
+    
+    def set_url_img_secondary(self, new_url_img_secondary):
+        self.url_img_secondary = new_url_img_secondary
 
     def upload_img_nii(self, url):
         img = nib.load(url)

@@ -2,6 +2,13 @@ import SimpleITK as sitk
 import numpy as np
 
 
+def numpy_to_sitk(image_array, spacing=(1.0, 1.0, 1.0)):
+    """Converts a numpy array to a SimpleITK image."""
+    sitk_image = sitk.GetImageFromArray(image_array)
+    # sitk_image.SetSpacing(spacing)
+    return sitk_image
+
+
 def convert_to_float32(image_path):
     """
     Reads an image using SimpleITK and casts it to float32 data type.
@@ -20,7 +27,7 @@ def convert_to_float32(image_path):
     return image
 
 
-def register_images(fixed_image_path, moving_image_path):
+def registration(fixed_image_url, moving_image_url):
     """
     Performs medical image registration using SimpleITK.
 
@@ -32,10 +39,10 @@ def register_images(fixed_image_path, moving_image_path):
             - "fixed_image_array": The fixed image as a numpy array.
             - "registered_moving_image_array": The registered moving image as a numpy array.
     """
-
+    print('Start Registration')
     # Load images and convert to float32
-    fixed_image = convert_to_float32(fixed_image_path)
-    moving_image = convert_to_float32(moving_image_path)
+    fixed_image = convert_to_float32(fixed_image_url)
+    moving_image = convert_to_float32(moving_image_url)
 
     # Check the data types of the images
     fixed_image_type = fixed_image.GetPixelIDValue()
@@ -56,19 +63,16 @@ def register_images(fixed_image_path, moving_image_path):
 
     # Create registration method
     registration_method = sitk.ImageRegistrationMethod()
-    registration_method.SetMetricAsMeanSquares()
+    registration_method.SetMetricAsMeanSquares()  # Choose an appropriate metric
 
-    registration_method.SetOptimizerAsRegularStepGradientDescent(learningRate=4.0,
-                                                                minimumStepLength=0.01,
-                                                                numberOfIterations=200)
+    registration_method.SetOptimizerAsRegularStepGradientDescent(4.0, 0.01, 200)
 
     registration_method.SetInitialTransform(sitk.TranslationTransform(fixed_image.GetDimension()))
 
     registration_method.SetInterpolator(sitk.sitkLinear)
 
-    outTx = registration_method.Execute(fixed_image, moving_image)
+    outTx = registration_method.Execute(fixed_image,moving_image)
 
-    # Resample registered moving image to fixed image space
     resampler = sitk.ResampleImageFilter()
     resampler.SetReferenceImage(fixed_image)
     resampler.SetInterpolator(sitk.sitkLinear)
@@ -79,6 +83,8 @@ def register_images(fixed_image_path, moving_image_path):
 
     # Convert images to NumPy arrays
     fixed_image_array = sitk.GetArrayFromImage(fixed_image)
-    registered_moving_image_array = sitk.GetArrayFromImage(result)
+    moving_image_array = sitk.GetArrayFromImage(result)
+    print('End Registration')
 
-    return fixed_image_array, registered_moving_image_array
+    # return fixed_image_array, moving_image_array
+    return moving_image_array

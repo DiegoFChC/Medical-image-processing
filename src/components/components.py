@@ -267,15 +267,22 @@ class Option_Menu:
 
 
 class Canvas:
-    def __init__(self, tk, master, width, height, option_menu, app_status, algorithm_status):
+    def __init__(self, tk, master, width, height, option_menu, app_status, algorithm_status, color):
         self.canvas = tk.Canvas(master, width=width, height=height)
         self.app_status = app_status
         self.algorithm_status = algorithm_status
         self.option_menu = option_menu
         self.add_actions_canvas()
+        self.color = color
 
     def get_canvas(self):
         return self.canvas
+    
+    def get_color(self):
+        return self.color
+    
+    def set_color(self, newColor):
+        self.color = newColor
 
     def show_canvas(self):
         self.canvas.pack()
@@ -298,29 +305,29 @@ class Canvas:
         if self.option_menu.get() == "coronal":
             for i in range(10):
                 self.algorithm_status.set_annotated_array(
-                    cord_i+i, cord_j+i, int(self.app_status.get_current_depth()), self.app_status.get_app_img_main())
+                    cord_i+i, cord_j+i, int(self.app_status.get_current_depth()), self.app_status.get_app_img_main(), self.color)
             for j in range(10):
                 self.algorithm_status.set_annotated_array(
-                    cord_i-j, cord_j-j, int(self.app_status.get_current_depth()), self.app_status.get_app_img_main())
+                    cord_i-j, cord_j-j, int(self.app_status.get_current_depth()), self.app_status.get_app_img_main(), self.color)
         elif self.option_menu.get() == "sagital":
             for i in range(10):
                 self.algorithm_status.set_annotated_array(
-                    int(self.app_status.get_current_depth()), cord_i+i, cord_j+i, self.app_status.get_app_img_main())
+                    int(self.app_status.get_current_depth()), cord_i+i, cord_j+i, self.app_status.get_app_img_main(), self.color)
             for j in range(10):
                 self.algorithm_status.set_annotated_array(
-                    int(self.app_status.get_current_depth()), cord_i-j, cord_j-j, self.app_status.get_app_img_main())
+                    int(self.app_status.get_current_depth()), cord_i-j, cord_j-j, self.app_status.get_app_img_main(), self.color)
         elif self.option_menu.get() == "axial":
             for i in range(10):
                 self.algorithm_status.set_annotated_array(
-                    cord_i+i, int(self.app_status.get_current_depth()), cord_j-i, self.app_status.get_app_img_main())
+                    cord_i+i, int(self.app_status.get_current_depth()), cord_j-i, self.app_status.get_app_img_main(), self.color)
             for j in range(10):
                 self.algorithm_status.set_annotated_array(
-                    cord_i-j, int(self.app_status.get_current_depth()), cord_j-j, self.app_status.get_app_img_main())
+                    cord_i-j, int(self.app_status.get_current_depth()), cord_j-j, self.app_status.get_app_img_main(), self.color)
 
         # Dibujar una línea desde las coordenadas anteriores a las actuales
         if self.app_status.get_draw_x_prev() is not None and self.app_status.get_draw_y_prev() is not None:
             self.canvas.create_line(self.app_status.get_draw_x_prev(
-            ), self.app_status.get_draw_y_prev(), x, y, fill="red", width=20)
+            ), self.app_status.get_draw_y_prev(), x, y, fill=self.color, width=20)
 
         # Actualizar las coordenadas anteriores
         self.app_status.set_draw_x_prev(x)
