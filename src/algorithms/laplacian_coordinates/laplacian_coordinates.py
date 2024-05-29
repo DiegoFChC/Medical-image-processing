@@ -2,8 +2,8 @@ import numpy as np
 from scipy import ndimage
 from scipy.sparse import lil_matrix, find, diags, csr_matrix
 import scipy.sparse.linalg as spla
-from skimage.measure import block_reduce
-import math
+# from skimage.measure import block_reduce
+# import math
 
 # Matriz de adyacencia con pesos - Ecuacion 1
 def ecuacion1(imagen, beta = 1):
@@ -17,10 +17,10 @@ def ecuacion1(imagen, beta = 1):
   nx, ny = imagen.shape
 
   # voxeles visitados
-  visitados = np.zeros((boxeles, boxeles))
+  # visitados = np.zeros((boxeles, boxeles))
 
   # Para sigma
-  diferencias = np.zeros((boxeles, boxeles))
+  # diferencias = np.zeros((boxeles, boxeles))
 
   # Para calcular el peso
   # sigma = np.max(diferencias)
@@ -33,7 +33,37 @@ def ecuacion1(imagen, beta = 1):
     # print(peso)
     return np.exp(peso)
 
+  # Calculo de las diferencias entre intensidades de vecinos para hallar la máxima
+  diff_array = []
 
+  # Recorrer cada pixel en el arreglo 2D
+  for i in range(imagen.shape[0]):
+    for j in range(imagen.shape[1]):
+      # Obtener el valor del pixel actual
+      current_pixel = imagen[i, j]
+
+      # Calcular las diferencias con los vecinos
+      # Arriba
+      if i > 0:
+        diff_array.append(np.abs(current_pixel - imagen[i - 1, j]))
+
+      # Abajo
+      if i < imagen.shape[0] - 1:
+        diff_array.append(np.abs(current_pixel - imagen[i + 1, j]))
+
+      # Izquierda
+      if j > 0:
+        diff_array.append(np.abs(current_pixel - imagen[i, j - 1]))
+
+      # Derecha
+      if j < imagen.shape[1] - 1:
+        diff_array.append(np.abs(current_pixel - imagen[i, j + 1]))
+
+  sigma = np.max(diff_array)
+  # print("dif", np.max(diff_array), np.min(diff_array))
+  # print('len', len(diff_array))
+  # print('len2', imagen.shape[0]*imagen.shape[1])
+  # sigma = 1
 
   # Recorrer cada elemento del array 3D
   for i in range(imagen.shape[0]):
@@ -50,15 +80,16 @@ def ecuacion1(imagen, beta = 1):
                       # Calcular el índice lineal del vecino
                       vecino = ni * ny + nj
 
-                      if visitados[nodo, vecino] != 1 or visitados[vecino, nodo] != 1 or True:
+                      # if visitados[nodo, vecino] != 1 or visitados[vecino, nodo] != 1 or True:
+                      if True:
 
                         # Para control
-                        visitados[nodo, vecino] = 1
-                        visitados[vecino, nodo] = 1
+                        # visitados[nodo, vecino] = 1
+                        # visitados[vecino, nodo] = 1
                         # diferencias[nodo, vecino] = np.abs(imagen[i, j] - imagen[ni, nj])
 
                         # sigma = np.max(diferencias) + np.power(10.0, -6)
-                        sigma = np.max(np.abs(imagen[i, j] - imagen[ni, nj])) + np.power(10.0, -6)
+                        # sigma = np.max(np.abs(imagen[i, j] - imagen[ni, nj])) + np.power(10.0, -6)
 
                         # Calcular el peso de la arista
                         # peso = abs(imagen[i, j] - imagen[ni, nj])
@@ -133,9 +164,11 @@ def solve_linear_system(di, m_adyacencia, imagen, semillas_background, semillas_
   b = np.zeros_like(imagen)
 
   for semilla in semillas_background:
+      # print(semilla)
       Is[(semilla)] = 1
       b[(semilla)] = imagen[(semilla)]
   for semilla in semillas_foreground:
+      # print(semilla)
       Is[(semilla)] = 1
       b[(semilla)] = imagen[(semilla)]
 
@@ -163,10 +196,15 @@ def etiquetado_final(imagen, soluciones, semillas_background, semillas_foregroun
 
   # Ecuacion 3
   # Promedio de intensidades de background y foreground
-  valores_background = np.mean(imagen[semillas_background[:, 0], semillas_background[:, 1]])
-  valores_foreground = np.mean(imagen[semillas_foreground[:, 0], semillas_foreground[:, 1]])
+  # valores_background = np.mean(imagen[semillas_background[:, 0], semillas_background[:, 1]])
+  # valores_foreground = np.mean(imagen[semillas_foreground[:, 0], semillas_foreground[:, 1]])
 
-  promedio = (np.sum(valores_background) + np.sum(valores_foreground)) / 2
+  # promedio = (np.sum(valores_background) + np.sum(valores_foreground)) / 2
+  
+  valores_background = np.mean(imagen[semillas_background])
+  valores_foreground = np.mean(imagen[semillas_foreground])
+
+  promedio = ((valores_background) + (valores_foreground)) / 2
   print(promedio, valores_background, valores_foreground)
   for i, xi in enumerate(soluciones):
 
@@ -174,14 +212,35 @@ def etiquetado_final(imagen, soluciones, semillas_background, semillas_foregroun
 
     if xi < promedio:
        new_image[coordenada] = 1
+      #  new_image[coordenada] = imagen[coordenada]
 
   return new_image
 
 
-def run_laplacian_coordinates(image, seeds_background, seeds_foreground):
+def run_laplacian_coordinates(image_main, seeds, slide, view):
+  print("laplacian_coordinates")
+  if view == 'coronal':
+    image = image_main[:, :, slide]
+    seeds_img = seeds[:, :, slide]
+  elif view == 'sagital':
+    image = image_main[slide, :, :]
+    seeds_img = seeds[slide, :, :]
+  elif view == 'axial':
+    image = image_main[:, slide, :]
+    seeds_img = seeds[:, slide, :]
+  
+  seeds_background = np.array(np.where(seeds_img == 1)).T
+  seeds_foreground = np.array(np.where(seeds_img == 2)).T
+  
+  # print(image.shape, view, slide)
+  # print(seeds_background)
+  # print(seeds_foreground)
+  
   matriz_adyacencia = ecuacion1(image, 1)
   pesos_di = array_di(matriz_adyacencia, image.shape)
   x_result = solve_linear_system(pesos_di, matriz_adyacencia, image, seeds_background, seeds_foreground)
   new_img = etiquetado_final(image, x_result, seeds_background, seeds_foreground)
+  
+  print("Fin laplacian_coordinates")
   
   return new_img

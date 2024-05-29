@@ -2,7 +2,7 @@ class Configuration_App:
     # Constants (no setters needed for constants)
     BACKGROUND_COLOR = '#000000'
     APP_WIDTH = 1600
-    APP_HEIGHT = 1000
+    APP_HEIGHT = 950
     SIDEBAR_WITDH = 250
 
     def __init__(self):

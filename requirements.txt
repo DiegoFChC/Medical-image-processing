@@ -4,3 +4,4 @@ matplotlib==3.8.4
 customtkinter==5.2.2
 pillow
 scipy
+SimpleITK==2.3.1
